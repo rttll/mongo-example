@@ -38,5 +38,7 @@
       "last 1 safari version"
     ]
   },
-  "devDependencies": {}
+  "devDependencies": {
+    "miragejs": "^0.1.41"
+  }
 }
