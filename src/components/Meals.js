@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import {
   BrowserRouter as Router,
   Switch,
@@ -10,13 +10,30 @@ import {
 import Meal from './Meal'
 
 function Meals() {
-  let { path, url } = useRouteMatch();
+  const [meals, setMeals] = useState([])
+  const { path, url } = useRouteMatch();
+
+  useEffect(() => {
+    fetch('/api/meals')
+      .then(resp => resp.json())
+      .then((json) => {
+        setMeals(json.meals)
+      })
+      .catch((err) => console.log)
+  }, []);
+
+
   return (
     <Switch>
       <Route exact path={path}>
         <h1>Meals</h1>
         <ul className="">
-          <li className="">
+          {meals.map(meal => 
+            <li key={meal.id}>
+              <span className="block p-4 px-8 cursor-pointer hover:bg-gray-100">{meal.text}</span>
+            </li>
+          )}
+          {/* <li className="">
             <Link to={`${url}/a`} className="block p-4 px-8 cursor-pointer hover:bg-gray-100">Chicken & rice</Link>
           </li>
           <li className="">
@@ -24,7 +41,7 @@ function Meals() {
           </li>
           <li className="">
             <Link to={`${url}/c`} className="block p-4 px-8 cursor-pointer hover:bg-gray-100">Vegetable</Link>
-          </li>
+          </li> */}
         </ul>
       </Route>
       <Route path={`${path}/:mealId`}>

@@ -3,6 +3,9 @@ import ReactDOM from 'react-dom';
 import './assets/index.css';
 import App from './components/App';
 // import reportWebVitals from './test/reportWebVitals';
+import makeServer from "./server";
+
+makeServer()
 
 ReactDOM.render(
   <React.StrictMode>

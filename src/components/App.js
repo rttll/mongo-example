@@ -1,5 +1,4 @@
 import { useState } from 'react'
-import { Frame, Scroll, useCycle } from "framer"
 import {
   BrowserRouter as Router,
   Switch,
@@ -22,8 +21,8 @@ function App() {
           <Link className="p-4 cursor-pointer hover:bg-red-300" to="/login">Login</Link>
         </header>
         <div
-          style={{height: '400px'}}
-          className="w-full bg-white rounded-lg shadow-lg md:w-1/2"
+          // style={{height: '400px'}}
+          className="relative w-full bg-white rounded-lg shadow-lg md:w-1/2"
         >
           <Switch>
             <Route exact path="/">
