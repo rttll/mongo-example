@@ -1,5 +1,5 @@
 import { belongsTo, createServer, hasMany, Model } from 'miragejs'
-
+import moment from 'moment'
 function include(record, associationName) {
 
 }
@@ -23,22 +23,39 @@ function Server() {
       server.create("meal", { text: "Meal 1" })
       server.create("meal", { text: "Meal 2" })
       
-      const week = server.create("week", { start: Date.now() })
-      days.forEach((day) => {
-        server.create("day", { text: day, week: week })
-      })
+      let start = moment()
+      // days.forEach((day) => {
+      //   server.create("day", { text: day, week: week })
+      // })
     },
     
     routes() {
 
-      // GET /weeks
-      this.get('/api/weeks', (schema) => {
+      // GET /days
+      this.get('/api/days', (schema) => {
         let all = schema.weeks.all()
         return all.models.map((week) => {
           let attrs = week.attrs
           attrs.days = week.days.models
           return attrs
         })
+      })
+
+      this.post('/api/days/batch', (schema, request) => {
+        const dates = JSON.parse(request.requestBody).dates
+        let days = []
+        for (const date of dates) {
+          days.push(schema.days.findOrCreateBy({date: date}))
+        }
+        return days
+      })
+
+      // PATCH day
+      this.patch('/api/days/:id', (schema, request) => {
+        let day = schema.days.find(request.params.id)
+        let body = JSON.parse(request.requestBody)
+        let updates = {day, ...body.day}
+        return day.update(updates)
       })
 
       // GET /meals
@@ -50,14 +67,6 @@ function Server() {
       this.post('/api/meals', (schema, request) => {
         let attrs = JSON.parse(request.requestBody)
         return schema.meals.create(attrs)
-      })
-
-      // PATCH days
-      this.patch('/api/days/:id', (schema, request) => {
-        let day = schema.days.find(request.params.id)
-        let body = JSON.parse(request.requestBody)
-        let updates = {day, ...body.day}
-        return schema.days.find(id).update(updates)
       })
 
       this.patch('/api/meals/:id', (schema, request) => {

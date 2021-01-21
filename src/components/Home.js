@@ -1,4 +1,6 @@
 import React, { useState, useEffect } from "react";
+import moment from 'moment'
+import API from '../services/api'
 import {
   Link,
   useRouteMatch
@@ -6,35 +8,25 @@ import {
 import MealsList from './MealList'
 
 function Home() {
-  const [weeks, setWeeks] = useState([])
+  window.moment = moment
   const [days, setDays] = useState([])
   const [meals, setMeals] = useState([])
   const [showMeals, setShowMeals] = useState(false)
   const [activeDay, setActiveDay] = useState(null)
   let { path, url } = useRouteMatch();
   
-  // const days = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday']
   useEffect(() => {
-    fetch('/api/weeks')
-      .then((resp) => resp.json())
-      .then((json) => {
-        setWeeks(json)
-        setDays(json[0].days)
-        console.log(json[0].days)
+    let dates = [0, 1, 2, 3, 4, 5, 6].map(int => moment().add(int, 'days'))
+    API.post('/api/days/batch', {dates: dates})
+      .then((json) => { 
+        setDays(json.map(obj => {
+          return {...obj, ...{date: moment(obj.date)}}
+        }))
       })
-      .catch(err => console.log)
+      
   }, [])
-  
-  // useEffect(() => {
-  //   fetch(`/api/weeks/${}`)
-  //     .then((resp) => resp.json())
-  //     .then((json) => {
-  //       setWeeks(json)
-  //       setDays(json[0].days)
-  //       console.log(json[0].days)
-  //     })
-  //     .catch(err => console.log)
-  // }, [])
+
+
 
   function openMealsFor(day) {
     setActiveDay(day)
@@ -42,7 +34,6 @@ function Home() {
   }
   
   function setMeal(id) {
-
     setShowMeals(false)
   }
   
@@ -51,11 +42,9 @@ function Home() {
       <ul className="">
         {days.map(day => 
           <li key={day.id}>
-            {false ? 
-              <Link to={`${url}/`} className="block p-4 px-8 cursor-pointer hover:bg-gray-100">{day.text}</Link>
-              : 
-              <span onClick={() => openMealsFor(day)} className="block p-4 px-8 cursor-pointer hover:bg-gray-100">{day.text}</span>
-            }
+            <Link to={`${url}/`} className="block p-4 px-8 cursor-pointer hover:bg-gray-100">
+              {day.date.format('dddd')}
+            </Link>
           </li>
         )}
       </ul>
