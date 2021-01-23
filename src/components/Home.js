@@ -13,20 +13,22 @@ function Home() {
   const [meals, setMeals] = useState([])
   const [showMeals, setShowMeals] = useState(false)
   const [activeDay, setActiveDay] = useState(null)
+  
   let { path, url } = useRouteMatch();
   
   useEffect(() => {
-    let dates = [0, 1, 2, 3, 4, 5, 6].map(int => moment().add(int, 'days'))
-    API.post('/api/days/batch', {dates: dates})
+    const today = moment().local()
+
+    let dates = [0, 1, 2, 3, 4, 5, 6]
+      .map(int => moment().add(int, 'days'))
+
+    API.post('days/batch', {dates: dates})
       .then((json) => { 
         setDays(json.map(obj => {
           return {...obj, ...{date: moment(obj.date)}}
         }))
       })
-      
   }, [])
-
-
 
   function openMealsFor(day) {
     setActiveDay(day)
@@ -42,7 +44,7 @@ function Home() {
       <ul className="">
         {days.map(day => 
           <li key={day.id}>
-            <Link to={`${url}/`} className="block p-4 px-8 cursor-pointer hover:bg-gray-100">
+            <Link to={`/days/${day.id}`} className="block p-4 px-8 cursor-pointer hover:bg-gray-100">
               {day.date.format('dddd')}
             </Link>
           </li>

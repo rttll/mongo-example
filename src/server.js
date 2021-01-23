@@ -1,7 +1,11 @@
 import { belongsTo, createServer, hasMany, Model } from 'miragejs'
 import moment from 'moment'
-function include(record, associationName) {
 
+function include(record, associationName) {
+  const children = record[associationName].models.map(m => m.attrs)
+  let association = {}
+  association[associationName] = children
+  return {...record.attrs, ...association}
 }
 
 function Server() {
@@ -10,7 +14,7 @@ function Server() {
     models: {
       meal: Model,
       day: Model.extend({
-        meal: hasMany(),
+        meals: hasMany(),
         week: belongsTo()
       }),
       week: Model.extend({
@@ -20,13 +24,8 @@ function Server() {
 
     seeds(server) {
       server.create("meal", { text: "Meal 1" })
-      server.create("meal", { text: "Meal 1" })
       server.create("meal", { text: "Meal 2" })
-      
-      let start = moment()
-      // days.forEach((day) => {
-      //   server.create("day", { text: day, week: week })
-      // })
+      server.create("meal", { text: "Meal 3" })
     },
     
     routes() {
@@ -40,12 +39,27 @@ function Server() {
           return attrs
         })
       })
-
+      
+      // GET /day/:id
+      this.get('/api/days/:id', (schema, request) => {
+        let day = schema.days.find(request.params.id)
+        if (day === null) {
+          day = schema.days.create({
+            date: moment()
+          })
+        }
+        // day.mealIds = [1, 2]
+        const meals = day.meals.models.map(m => m.attrs)
+        return {...day.attrs, ...{meals: meals}}
+      })
+      
+      // POST days/batch
       this.post('/api/days/batch', (schema, request) => {
         const dates = JSON.parse(request.requestBody).dates
         let days = []
         for (const date of dates) {
-          days.push(schema.days.findOrCreateBy({date: date}))
+          const day = schema.days.findOrCreateBy({date: date})
+          days.push(day)
         }
         return days
       })
@@ -54,8 +68,14 @@ function Server() {
       this.patch('/api/days/:id', (schema, request) => {
         let day = schema.days.find(request.params.id)
         let body = JSON.parse(request.requestBody)
-        let updates = {day, ...body.day}
-        return day.update(updates)
+        if ( body.add_meal ) {
+          let meal = schema.meals.find(body.add_meal)
+          day.meals.add(meal)
+          return include(day, 'meals')
+        } else {
+          let updates = {day, ...body.day}
+          return day.update(updates)
+        }
       })
 
       // GET /meals
