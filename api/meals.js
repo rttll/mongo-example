@@ -1,21 +1,11 @@
-const { MongoClient } = require("mongodb");
- 
-let user = 'mongo0', pass = 'u3N4wvwP9NXy3j8f', dbName = 'meals'
-const url = `mongodb+srv://${user}:${pass}@cluster0.ikg5o.mongodb.net/${dbName}?retryWrites=true&w=majority&useUnifiedTopology=true`;
-const client = new MongoClient(url);
+const db = require('./db')
 
-async function run() {
+async function get() {
   try {
-    await client.connect();
-    const db = client.db('mongo0')
-    const meals = db.collection('meals')
-    let attrs = {
-      text: "new meal"
-    }
-    // let newMeal = await meals.insertOne(attrs)
-    const items = await meals.find({}).toArray();
-    return items
-
+    return db().then( (db) => {
+      const collection = db.collection('meals')
+      return collection.find({}).toArray();
+    })
   } catch (err) {
     console.error(err)
   }
@@ -26,6 +16,6 @@ async function run() {
 
 
 module.exports = async (req, res) => {
-  let resp = await run()
+  let resp = await get()
   return {meals: resp}
 }

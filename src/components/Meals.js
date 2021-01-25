@@ -15,6 +15,7 @@ function Meals() {
   const { path, url } = useRouteMatch();
 
   useEffect(() => {
+    console.log('effects meals')
     API.get('meals')
       .then((resp) => {
         setMeals(resp.meals)
