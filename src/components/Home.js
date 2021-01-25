@@ -20,7 +20,7 @@ function Home() {
     const today = moment().local()
 
     let dates = [0, 1, 2, 3, 4, 5, 6]
-      .map(int => moment().add(int, 'days'))
+      .map(int => moment().add(int, 'days').format('yyyy-MM-D'))
 
     API.post('days/batch', {dates: dates})
       .then((json) => { 

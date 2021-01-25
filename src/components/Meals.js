@@ -7,6 +7,7 @@ import {
   useParams,
   useRouteMatch
 } from "react-router-dom";
+import API from '../services/api'
 import Meal from './Meal'
 
 function Meals() {
@@ -14,12 +15,13 @@ function Meals() {
   const { path, url } = useRouteMatch();
 
   useEffect(() => {
-    fetch('/api/meals')
-      .then(resp => resp.json())
-      .then((json) => {
-        setMeals(json.meals)
+    API.get('meals')
+      .then((resp) => {
+        setMeals(resp.meals)
       })
-      .catch((err) => console.log)
+      .catch((err) => {
+          console.log(err)
+      })
   }, []);
 
 
@@ -29,19 +31,12 @@ function Meals() {
         <h1>Meals</h1>
         <ul className="">
           {meals.map(meal => 
-            <li key={meal.id}>
-              <span className="block p-4 px-8 cursor-pointer hover:bg-gray-100">{meal.text}</span>
+            <li key={meal._id}>
+              <span className="block p-4 px-8 cursor-pointer hover:bg-gray-100">
+                {meal.text}
+              </span>
             </li>
           )}
-          {/* <li className="">
-            <Link to={`${url}/a`} className="block p-4 px-8 cursor-pointer hover:bg-gray-100">Chicken & rice</Link>
-          </li>
-          <li className="">
-            <Link to={`${url}/b`} className="block p-4 px-8 cursor-pointer hover:bg-gray-100">Minestrone</Link>
-          </li>
-          <li className="">
-            <Link to={`${url}/c`} className="block p-4 px-8 cursor-pointer hover:bg-gray-100">Vegetable</Link>
-          </li> */}
         </ul>
       </Route>
       <Route path={`${path}/:mealId`}>

@@ -70,7 +70,10 @@ function Server() {
         let body = JSON.parse(request.requestBody)
         if ( body.add_meal ) {
           let meal = schema.meals.find(body.add_meal)
+          console.log('meals', schema.meals.all(), meal)
           day.meals.add(meal)
+          day.meals.add(schema.meals.create({ text: "Meal 4" }))
+          console.log(day.meals)
           return include(day, 'meals')
         } else {
           let updates = {day, ...body.day}

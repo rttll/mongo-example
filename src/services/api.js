@@ -1,13 +1,17 @@
-const base = '/api'
+const base = window.location.hostname === 'localhost' ? 'http://localhost:9000' : '/api'
 const dispatch = (method, url, data = null) => {
   
   let config = { method: method }
   if ( data !== null) { config.body = JSON.stringify(data) }
   
-  return fetch(`${base}/${url}`, config)
+  return fetch(`${base}/meals`)
     .then((resp) => resp.json())
     .then((json) => json)
     .catch(err => console.log)
+  // return fetch(`${base}/${url}`, config)
+  //   .then((resp) => resp.json())
+  //   .then((json) => json)
+  //   .catch(err => console.log)
 }
 
 const API = {
