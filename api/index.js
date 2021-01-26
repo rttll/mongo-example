@@ -27,7 +27,7 @@ app.get('/', (req, res) => {
 })
 
 app.get('/meals', async (req, res) => {
-  res.json( await meals(req, res) )
+  await meals(req, res)
 })
 
 let port = process.env.PORT;

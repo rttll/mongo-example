@@ -15,9 +15,9 @@ function Meals() {
   const { path, url } = useRouteMatch();
 
   useEffect(() => {
-    console.log('effects meals')
     API.get('meals')
       .then((resp) => {
+        console.log(resp)
         setMeals(resp.meals)
       })
       .catch((err) => {
@@ -29,12 +29,12 @@ function Meals() {
   return (
     <Switch>
       <Route exact path={path}>
-        <h1>Meals</h1>
+        <h1 className="p-4">Meals</h1>
         <ul className="">
           {meals.map(meal => 
             <li key={meal._id}>
-              <span className="block p-4 px-8 cursor-pointer hover:bg-gray-100">
-                {meal.text}
+              <span className="block p-4 cursor-pointer hover:bg-gray-100">
+                {meal.name}
               </span>
             </li>
           )}
