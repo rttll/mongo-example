@@ -20,8 +20,9 @@ function Day() {
   
   useEffect(() => {
     console.log('fetching day')
-    API.get('days/' + id)
+    API.get('days?id=' + id)
       .then((json) => {
+        debugger
         setDay({...json, ...{date: moment(json.date)}})
         if ( json.meals.length > 0) setMeals(json.meals)
       })
