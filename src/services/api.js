@@ -1,8 +1,14 @@
 const base = window.location.hostname === 'localhost' ? 'http://localhost:9000' : '/api'
+
 const dispatch = (method, url, data = null) => {
   
   let config = { method: method }
-  if ( data !== null) { config.body = JSON.stringify(data) }
+  if ( data !== null) { 
+    config.body = JSON.stringify(data) 
+    config.headers = {
+      'Content-Type': 'application/json'
+    }
+  }
 
   return fetch(`${base}/${url}`, config)
     .then((resp) => resp.json())
@@ -19,6 +25,9 @@ const API = {
   },
   patch(url, data) {
     return dispatch('patch', url, data)
+  },
+  delete(url, data) {
+    return dispatch('delete', url, data)
   },
 }
 

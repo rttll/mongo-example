@@ -15,15 +15,15 @@ import './App.css';
 function App() {
   return (
     <Router>
-      <div className="flex flex-col items-center w-screen h-screen pt-8">
-        <header className="fixed top-0 left-0 flex w-full bg-white shadow-sm">
-          <Link className="p-1 text-sm cursor-pointer hover:bg-red-300" to="/">Home</Link>
+      <div className="flex flex-col items-center w-screen h-screen bg-white">
+        <header className="fixed top-0 left-0 flex w-full">
+          {/* <Link className="p-1 text-sm cursor-pointer hover:bg-red-300" to="/">Home</Link>
           <Link className="p-1 text-sm cursor-pointer hover:bg-red-300" to="/meals">Meals</Link>
-          <Link className="p-1 text-sm cursor-pointer hover:bg-red-300" to="/login">Login</Link>
+          <Link className="p-1 text-sm cursor-pointer hover:bg-red-300" to="/login">Login</Link> */}
         </header>
         <div
           style={{minHeight: '400px'}}
-          className="relative w-full bg-white rounded-lg shadow-lg md:w-1/2"
+          className="relative w-full md:w-1/2"
         >
           <Switch>
             <Route exact path="/">

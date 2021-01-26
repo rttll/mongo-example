@@ -9,6 +9,7 @@ import MealsList from './MealList'
 
 function Home() {
   window.moment = moment
+  const [addingDay, setaddingDay] = useState(false)
   const [days, setDays] = useState([])
   const [meals, setMeals] = useState([])
   const [showMeals, setShowMeals] = useState(false)
@@ -17,18 +18,20 @@ function Home() {
   let { path, url } = useRouteMatch();
   
   useEffect(() => {
-    const today = moment().local()
-
-    let dates = [0, 1, 2, 3, 4, 5, 6]
-      .map(int => moment().add(int, 'days').format('yyyy-MM-D'))
-
-    API.post('days/batch', {dates: dates})
-      .then((json) => { 
-        setDays(json.map(obj => {
+    API.get('days')
+      .then((resp) => { 
+        setDays(resp.days.map(obj => {
           return {...obj, ...{date: moment(obj.date)}}
         }))
       })
   }, [])
+
+  function clear() {
+    API.delete('days', [])
+      .then((resp) => {
+        setDays([])
+      })
+  }
 
   function openMealsFor(day) {
     setActiveDay(day)
@@ -38,18 +41,38 @@ function Home() {
   function setMeal(id) {
     setShowMeals(false)
   }
+
+  function addDay() {
+    if ( addingDay ) return;
+    setaddingDay(true)
+    
+    let date = days.length > 0 ? 
+    moment(days[days.length - 1].date).add(1, 'day').format('yyyy-MM-D') :
+    moment().format('yyyy-MM-D')
+    
+    API.post('days', {date: date})
+    .then(day => {
+      day.date = moment(day.date)
+        setDays(days.concat([day]))
+        setaddingDay(false)
+        })
+        .catch(console.log)
+  }
   
   return (
     <>
       <ul className="">
         {days.map(day => 
-          <li key={day.id}>
-            <Link to={`/days/${day.id}`} className="block p-4 px-8 cursor-pointer hover:bg-gray-100">
-              {day.date.format('dddd')}
+          <li key={day._id}>
+            <Link to={`/days/${day.id}`} className="flex justify-between p-4 border-b border-gray-200 cursor-pointer hover:bg-gray-100">
+              <span className="text-sm">{day.date.format('dddd')}</span>
+              <span className="text-sm text-gray-400">{day.date.format('M/D')}</span>
             </Link>
           </li>
         )}
       </ul>
+      <a href="#" onClick={ addDay } className="block p-4 my-8 text-lg text-center text-blue-400 bg-blue-100">+</a>
+      { days.length > 0 && <a href="#" onClick={ clear } className="inline-block p-4 my-8 text-lg text-red-600">X</a> }
       {showMeals && 
         <MealsList 
           onItemClick={ setMeal }
