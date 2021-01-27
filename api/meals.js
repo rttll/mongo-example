@@ -1,28 +1,46 @@
+const { ObjectID } = require("mongodb");
+const { connectToDatabase, setCollection, getId} = require('./db_helper')
+const log = console.log
 
-if ( process.env.NODE_ENV !== 'production') {
-  require('dotenv').config()
+let db = null, collection = null;
+
+async function setup() {
+  db = await connectToDatabase()
+  collection = await setCollection('meals')
 }
 
-const url = require('url')
-const { MongoClient } = require("mongodb");
-
-let cachedDb = null
-
-async function connectToDatabase(uri) {
-  if (cachedDb) {
-    return cachedDb
-  }
-  
-  const client = await MongoClient.connect(uri, { useNewUrlParser: true })
-  const db = await client.db(url.parse(uri).pathname.substr(1))
-  
-  cachedDb = db
-  return db
+const getOneMeal = async (id) => {
+  const meal = await collection.findOne({_id: parseInt(id)})
+  return { meal }
 }
 
-module.exports = async (req, res) => {
-  const db = await connectToDatabase(process.env.MONGODB_URI)
-  const collection = await db.collection('meals')
+const getMeals = async () => {
   const meals = await collection.find({}).toArray()
-  res.status(200).json({ meals })
+  return { meals }
+}
+
+module.exports = {
+  get: async (req, res) => {
+    await setup()
+    const resp = req.query.id ? await getOneMeal(req.query.id) : await getMeals()
+    res.status(200).json( resp )
+  },
+  post: async (req, res) => {
+    await setup()
+    const result = await collection.insertOne({
+      _id: await getId('meals'),
+      name: req.body.name,
+    })
+    res.status(200).json(result.ops[0])
+  },
+  patch: async (req, res) => {
+    await setup()
+    const result = await collection.updateOne({_id: parseInt(req.body.id)}, { $set: req.body.meal })
+    res.status(200).json(result)
+  },
+  delete: async (req, res) => {
+    await setup()
+    const result = await collection.deleteMany(req.body.docs)
+    res.status(200).json(result)
+  }
 }

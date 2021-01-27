@@ -9,7 +9,7 @@ const dispatch = (method, url, data = null) => {
       'Content-Type': 'application/json'
     }
   }
-  console.log('api', config)
+  // console.log('api', config)
   return fetch(`${base}/${url}`, config)
     .then((resp) => resp.json())
     .then((json) => json)

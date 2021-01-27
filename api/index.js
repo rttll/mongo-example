@@ -23,16 +23,22 @@ app.use(function(req, res, next) {
   next();
 });
 
+/* Meals */
 app.get('/', (req, res) => {
   res.status(200).send(`OK [${process.env.NODE_ENV}]`)
 })
 
 app.get('/meals', async (req, res) => {
-  await meals(req, res)
+  await meals.get(req, res)
 })
 
+app.post('/meals', async (req, res) => {
+  await meals.post(req, res)
+})
+
+/* Days */
+
 app.get('/days', async (req, res) => {
-  console.log('get /days')
   await days.get(req, res)
 })
 
@@ -41,13 +47,16 @@ app.post('/days', async (req, res) => {
 })
 
 app.patch('/days', async (req, res) => {
-  console.log('patch /days')
   await days.patch(req, res)
 })
 
 app.delete('/days', async (req, res) => {
   await days.delete(req, res)
 })
+
+
+
+
 
 let port = process.env.PORT;
 if (port == null || port == "") {

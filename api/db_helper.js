@@ -7,7 +7,7 @@ const { MongoClient, ObjectID } = require("mongodb");
 
 const log = console.log
 
-let db = null, collection = {}, counters = {};
+let db = null, collections = {}, counters = null;
 
 async function connectToDatabase(uri = process.env.MONGODB_URI) {
   if (db) return db
@@ -18,17 +18,20 @@ async function connectToDatabase(uri = process.env.MONGODB_URI) {
 }
 
 async function setCollection(name) {
-  if ( collection[name] ) return collection[name]
+  if ( collections[name] ) return collections[name]
 
-  collection[name] = await db.collection(name)
-  return collection[name]
+  collections[name] = await db.collection(name)
+  return collections[name]
 }
 
 async function _setCounters(name) {
-  if ( counters[name] ) return
-  counters[name] = await db.collection('counters')
-  if ( await counters[name].countDocuments() === 0) {
-    counters[name].insertOne({
+  if ( counters === null) {
+    counters = await db.collection('counters')
+  }
+
+  let first = await counters.findOne({_id: name})
+  if ( first === null ) {
+    counters.insertOne({
       _id: name,
       seq: 0
     })
@@ -37,7 +40,7 @@ async function _setCounters(name) {
 
 async function getId(name) {
   await _setCounters(name)
-  const counter = await counters[name].findOneAndUpdate(
+  const counter = await counters.findOneAndUpdate(
     { _id: name, },
     { $inc: { seq: 1 } },
     { returnOriginal: true }

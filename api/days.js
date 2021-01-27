@@ -12,7 +12,7 @@ async function setup() {
 const getOneDay = async (id) => {
   const day = await collection.findOne({_id: parseInt(id)})
   const mealsCollection = await db.collection('meals')
-  const foo = await mealsCollection.find( { _id: { $in: day.meals.map(id => ObjectID(id)) } })
+  const foo = await mealsCollection.find( { _id: { $in: day.meals } })
   day.foo = await foo.toArray()
   return { day }
 }
@@ -40,7 +40,8 @@ module.exports = {
   patch: async (req, res) => {
     await setup()
     const result = await collection.updateOne({_id: parseInt(req.body.id)}, { $set: req.body.day })
-    res.status(200).json(result)
+    const day = await getOneDay(req.body.id)
+    res.status(200).json(day)
   },
   delete: async (req, res) => {
     await setup()
