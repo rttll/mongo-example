@@ -5,15 +5,11 @@ import {
   Link,
   useRouteMatch
 } from "react-router-dom";
-import MealsList from './MealList'
 
 function Home() {
   window.moment = moment
   const [addingDay, setaddingDay] = useState(false)
   const [days, setDays] = useState([])
-  const [meals, setMeals] = useState([])
-  const [showMeals, setShowMeals] = useState(false)
-  const [activeDay, setActiveDay] = useState(null)
   
   let { path, url } = useRouteMatch();
   
@@ -33,30 +29,21 @@ function Home() {
       })
   }
 
-  function openMealsFor(day) {
-    setActiveDay(day)
-    setShowMeals(true)
-  }
-  
-  function setMeal(id) {
-    setShowMeals(false)
-  }
-
   function addDay() {
     if ( addingDay ) return;
     setaddingDay(true)
     
     let date = days.length > 0 ? 
-    moment(days[days.length - 1].date).add(1, 'day').format('yyyy-MM-D') :
-    moment().format('yyyy-MM-D')
+      moment(days[days.length - 1].date).add(1, 'day').format('yyyy-MM-D') :
+      moment().format('yyyy-MM-D')
     
     API.post('days', {date: date})
-    .then(day => {
-      day.date = moment(day.date)
+      .then(day => {
+        day.date = moment(day.date)
         setDays(days.concat([day]))
         setaddingDay(false)
-        })
-        .catch(console.log)
+      })
+      .catch(console.log)
   }
   
   return (
@@ -74,12 +61,6 @@ function Home() {
       </ul>
       <a href="#" onClick={ addDay } className="block p-4 my-8 text-lg text-center text-blue-400 bg-blue-100">+</a>
       { days.length > 0 && <a href="#" onClick={ clear } className="inline-block p-4 my-8 text-lg text-red-600">X</a> }
-      {showMeals && 
-        <MealsList 
-          onItemClick={ setMeal }
-          className={"absolute bg-white shadow-lg w-full top-0"}
-         /> 
-      }
     </>
   )
 }
