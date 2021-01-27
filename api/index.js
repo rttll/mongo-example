@@ -32,11 +32,17 @@ app.get('/meals', async (req, res) => {
 })
 
 app.get('/days', async (req, res) => {
+  console.log('get /days')
   await days.get(req, res)
 })
 
 app.post('/days', async (req, res) => {
   await days.post(req, res)
+})
+
+app.patch('/days', async (req, res) => {
+  console.log('patch /days')
+  await days.patch(req, res)
 })
 
 app.delete('/days', async (req, res) => {

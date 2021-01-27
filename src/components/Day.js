@@ -21,33 +21,34 @@ function Day() {
   useEffect(() => {
     console.log('fetching day')
     API.get('days?id=' + id)
-      .then((json) => {
-        debugger
-        setDay({...json, ...{date: moment(json.date)}})
-        if ( json.meals.length > 0) setMeals(json.meals)
+      .then((resp) => {
+        setDay({...resp.day, ...{date: moment(resp.day.date)}})
+        // if ( json.meals.length > 0) setMeals(json.meals)
       })
   }, [])
 
   const addMeal = (mealId) => {
-    history.push(`/days/${id}`)
-    API.patch(`days/${id}`, {add_meal: mealId})
+    // history.push(`/days/${id}`)
+    API.patch('days', { id: id, day: {meals: day.meals.concat([mealId])} } )
       .then((resp) => {
-        setMeals(meals.concat([resp.meals.pop()]))
+        console.log('added meal', resp)
+        // debugger
+        // setMeals(meals.concat([resp.meals.pop()]))
       })
   }
 
   return (
     <>
-      <h1 className="p-4 text-xs font-medium bg-green-200">{day && day.date.format('dddd')}</h1>
+      <h1 style={{fontSize: '8px'}} className="p-1 font-medium text-center text-white bg-gray-700">{day && day.date.format('dddd')}</h1>
       <Switch>
         <Route exact path={path}>
           {/* <Link to="/" className="block p-4">&larr; {day && day.date.format('dddd') }</Link> */}
           <ul>
-            { meals.length > 0 &&
-              meals.map(meal => 
-                <li key={meal.id}>
-                  <Link to={`/meals/${meal.id}`} className="block p-4 border-b border-gray-300 hover:bg-purple-200">
-                    {meal.text}
+            { day && day.foo.length > 0 &&
+              day.foo.map(meal => 
+                <li key={meal._id}>
+                  <Link to={`/meals/${meal._id}`} className="block p-4 border-b border-gray-300 hover:bg-purple-200">
+                    {meal.name}
                   </Link>
                 </li>
               )

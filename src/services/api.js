@@ -9,7 +9,7 @@ const dispatch = (method, url, data = null) => {
       'Content-Type': 'application/json'
     }
   }
-
+  console.log('api', config)
   return fetch(`${base}/${url}`, config)
     .then((resp) => resp.json())
     .then((json) => json)
@@ -18,16 +18,16 @@ const dispatch = (method, url, data = null) => {
 
 const API = {
   get(url) {
-    return dispatch('get', url)
+    return dispatch('GET', url)
   },
   post(url, data) {
-    return dispatch('post', url, data)
+    return dispatch('POST', url, data)
   },
   patch(url, data) {
-    return dispatch('patch', url, data)
+    return dispatch('PATCH', url, data)
   },
   delete(url, data) {
-    return dispatch('delete', url, data)
+    return dispatch('DELETE', url, data)
   },
 }
 

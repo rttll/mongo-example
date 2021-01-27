@@ -6,7 +6,7 @@ if ( process.env.NODE_ENV !== 'production') {
 const log = console.log
 
 const url = require('url')
-const { MongoClient } = require("mongodb");
+const { MongoClient, ObjectID } = require("mongodb");
 
 let db = null, collection = null, counters;
 
@@ -24,14 +24,6 @@ const setCollection = async () => {
     return collection
   }
   collection = await db.collection('days')
-}
-
-const getDays = async (req) => {
-  await connectToDatabase()
-  await setCollection()
-  const params = req.query.id ? {id: req.query.id} : {}
-  const days = await collection.find(params).toArray()
-  return { days }
 }
 
 const setCounters = async (name) => {
@@ -57,9 +49,26 @@ const getId = async (name) => {
   return counter.value.seq
 }
 
+
+const getOneDay = async (id) => {
+  const day = await collection.findOne({_id: parseInt(id)})
+  const mealsCollection = await db.collection('meals')
+  const foo = await mealsCollection.find( { _id: { $in: day.meals.map(id => ObjectID(id)) } })
+  day.foo = await foo.toArray()
+  return { day }
+}
+
+const getDays = async () => {
+  const days = await collection.find({}).toArray()
+  return { days }
+}
+
 module.exports = {
   get: async (req, res) => {
-    res.status(200).json( await getDays(req) )
+    await connectToDatabase()
+    await setCollection()
+    const resp = req.query.id ? await getOneDay(req.query.id) : await getDays()
+    res.status(200).json( resp )
   },
   post: async (req, res) => {
     await connectToDatabase()
@@ -67,8 +76,15 @@ module.exports = {
     const result = await collection.insertOne({
       _id: await getId('days'),
       date: req.body.date,
+      meals: []
     })
     res.status(200).json(result.ops[0])
+  },
+  patch: async (req, res) => {
+    await connectToDatabase()
+    await setCollection()
+    const result = await collection.updateOne({_id: parseInt(req.body.id)}, { $set: req.body.day })
+    res.status(200).json(result)
   },
   delete: async (req, res) => {
     await connectToDatabase()
