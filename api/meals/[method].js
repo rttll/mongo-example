@@ -1,12 +1,12 @@
 const { ObjectID } = require("mongodb");
-const { connectToDatabase, setCollection, getId} = require('./db_helper')
+const { connectToDatabase, setCollection, getId} = require('../db_helper')
 const log = console.log
 
 let db = null, collection = null;
 
 async function setup() {
-  db = await connectToDatabase()
-  collection = await setCollection('meals')
+  if (db === null) db = await connectToDatabase()
+  if (collection === null) collection = await setCollection('meals')
 }
 
 const getOneMeal = async (id) => {
@@ -19,14 +19,12 @@ const getMeals = async () => {
   return { meals }
 }
 
-module.exports = {
+const methods = {
   get: async (req, res) => {
-    await setup()
     const resp = req.query.id ? await getOneMeal(req.query.id) : await getMeals()
     res.status(200).json( resp )
   },
   post: async (req, res) => {
-    await setup()
     const result = await collection.insertOne({
       _id: await getId('meals'),
       name: req.body.name,
@@ -34,13 +32,17 @@ module.exports = {
     res.status(200).json(result.ops[0])
   },
   patch: async (req, res) => {
-    await setup()
     const result = await collection.updateOne({_id: parseInt(req.body.id)}, { $set: req.body.meal })
     res.status(200).json(result)
   },
   delete: async (req, res) => {
-    await setup()
     const result = await collection.deleteMany(req.body.docs)
     res.status(200).json(result)
   }
+}
+
+module.exports = async (req, res) => {
+  await setup()
+  const method = req.query.method || 'get'
+  methods[method](req, res)
 }

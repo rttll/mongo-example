@@ -34,6 +34,7 @@ function Day() {
       .then((resp) => {
         setDay({...resp.day, ...{date: moment(resp.day.date)}})
       })
+      .catch(console.error)
   }, [])  
   
   const bgName = (index) => {

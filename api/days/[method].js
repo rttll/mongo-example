@@ -1,16 +1,16 @@
 const { ObjectID } = require("mongodb");
-const { connectToDatabase, setCollection, getId} = require('./db_helper')
+const { connectToDatabase, setCollection, getId} = require('../db_helper')
 const log = console.log
 
-let db = null, collection = null;
+let db = null, daysCollection = null;
 
 async function setup() {
-  db = await connectToDatabase()
-  collection = await setCollection('days')
+  if (db === null) db = await connectToDatabase()
+  if (daysCollection === null) daysCollection = await setCollection('days')
 }
 
 const getOneDay = async (id) => {
-  const day = await collection.findOne({_id: parseInt(id)})
+  const day = await daysCollection.findOne({_id: parseInt(id)})
   const mealsCollection = await db.collection('meals')
   const foo = await mealsCollection.find( { _id: { $in: day.meals } })
   day.foo = await foo.toArray()
@@ -18,19 +18,17 @@ const getOneDay = async (id) => {
 }
 
 const getDays = async () => {
-  const days = await collection.find({}).toArray()
+  const days = await daysCollection.find({}).toArray()
   return { days }
 }
 
-module.exports = {
+const methods = {
   get: async (req, res) => {
-    await setup()
     const resp = req.query.id ? await getOneDay(req.query.id) : await getDays()
     res.status(200).json( resp )
   },
   post: async (req, res) => {
-    await setup()
-    const result = await collection.insertOne({
+    const result = await daysCollection.insertOne({
       _id: await getId('days'),
       date: req.body.date,
       meals: []
@@ -38,14 +36,18 @@ module.exports = {
     res.status(200).json(result.ops[0])
   },
   patch: async (req, res) => {
-    await setup()
-    const result = await collection.updateOne({_id: parseInt(req.body.id)}, { $set: req.body.day })
+    const result = await daysCollection.updateOne({_id: parseInt(req.body.id)}, { $set: req.body.day })
     const day = await getOneDay(req.body.id)
     res.status(200).json(day)
   },
   delete: async (req, res) => {
-    await setup()
-    const result = await collection.deleteMany(req.body.docs)
+    const result = await daysCollection.deleteMany(req.body.docs)
     res.status(200).json(result)
   }
+}
+
+module.exports = async (req, res) => {
+  await setup()
+  const method = req.query.method || 'get'
+  methods[method](req, res)
 }

@@ -17,7 +17,7 @@ function Meals() {
   useEffect(() => {
     API.get('meals')
       .then((resp) => {
-        console.log(resp)
+        // console.log(resp)
         setMeals(resp.meals)
       })
       .catch((err) => {

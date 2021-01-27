@@ -20,6 +20,7 @@ function Home() {
           return {...obj, ...{date: moment(obj.date)}}
         }))
       })
+      .catch(console.log)
   }, [])
 
   function clear() {
@@ -36,7 +37,6 @@ function Home() {
     let date = days.length > 0 ? 
       moment(days[days.length - 1].date).add(1, 'day').format('yyyy-MM-D') :
       moment().format('yyyy-MM-D')
-    
     API.post('days', {date: date})
       .then(day => {
         day.date = moment(day.date)
@@ -51,7 +51,6 @@ function Home() {
       <ul className="">
         {days.map(day => 
           <li key={day._id}>
-            { day._id }
             <Link to={`/days/${day._id}`} className="flex justify-between p-4 border-b border-gray-200 cursor-pointer hover:bg-gray-100">
               <span className="text-sm">{day.date.format('dddd')}</span>
               <span className="text-sm text-gray-400">{day.date.format('M/D')}</span>
