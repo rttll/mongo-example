@@ -14,17 +14,22 @@ const list = {
 
 const slideUp = {
   visible: {
+    // opacity: 1,
     y: 0,
     transition: {
+      // duration: 4,
       ease: 'easeOut',
     }
   },
-  hidden: { 
-    y: '100%',
+  hidden: offset => ({ 
+    y: offset,
+    // y: '100%',
+    // opacity: 0,
     transition: {
+      // duration: 4,
       ease: 'easeIn',
     }
-  },
+  }),
 }
 
 

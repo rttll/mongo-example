@@ -15,7 +15,7 @@ import './App.css';
 function App() {
   return (
     <Router>
-      <div className="flex flex-col items-center w-screen h-screen bg-white">
+      <div className="flex flex-col items-center w-screen min-h-screen bg-white">
         <header className="fixed top-0 left-0 flex w-full">
           {/* <Link className="p-1 text-sm cursor-pointer hover:bg-red-300" to="/">Home</Link>
           <Link className="p-1 text-sm cursor-pointer hover:bg-red-300" to="/meals">Meals</Link>

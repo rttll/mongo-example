@@ -87,16 +87,17 @@ function Day() {
                 key="card"
                 animate="visible"
                 initial="hidden"
-                variants={slideUp}
                 exit="hidden"
+                variants={slideUp}
+                custom={document.documentElement.clientHeight - 40}
                 onClick={ (e) => { e.currentTarget === e.target ? setIsAdding(false) : '' }}
                 className="absolute top-0 z-20 flex flex-col w-full h-screen pt-20 overflow-hidden"
               >
                 <MealList 
                   exclude={day.meals} 
                   onItemClick={addMeal}
-                  // style={{minHeight: `calc(100%)`}} 
-                  className="flex flex-col h-full overflow-y-auto bg-white border border-gray-200 rounded-tl-lg rounded-tr-lg"
+                  // style={{maxHeight: `30px`}} 
+                  className="flex flex-col h-full overflow-y-auto border border-gray-200 rounded-t-xl"
                 />
               </motion.div>
               }
