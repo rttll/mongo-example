@@ -1,7 +1,8 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import moment from 'moment'
 import API from '../services/api'
+import AppContext from '../services/app-context'
 import { list } from '../util/motion'
 
 import {
@@ -13,10 +14,11 @@ function Home() {
   window.moment = moment
   const [addingDay, setaddingDay] = useState(false)
   const [days, setDays] = useState([])
-
+  const context = useContext(AppContext)
   let { path, url } = useRouteMatch();
   
   useEffect(() => {
+    context.set()
     API.get('days')
       .then((resp) => { 
         setDays(resp.days.map(obj => {
@@ -70,7 +72,7 @@ function Home() {
         </AnimatePresence>
       </ul>
       <a href="#" onClick={ addDay } className="block p-4 my-8 text-lg text-center text-blue-400 bg-blue-100">+</a>
-      <div className="p-1 bg-blue-600">
+      <div className="p-1">
         { days.length > 0 && <a href="#" onClick={ clear } className="inline-block p-4 my-8 text-lg text-red-600">X</a> }
       </div>
     </>

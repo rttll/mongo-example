@@ -6,42 +6,52 @@ import {
   Link
 } from "react-router-dom";
 
+import AppHeader from './AppHeader'
 import Home from './Home'
 import Meals from './Meals'
 import Day from './Day'
 import Login from './Login'
+import AppContext from '../services/app-context'
 import './App.css';
 
 function App() {
+  const defaultText = 'Meal Planner'
+  const [headerText, setHeaderText] = useState(defaultText)
+  
+  const defaultHeader = {
+    text: headerText,
+    set: (text = defaultText) => {
+      setHeaderText(text)
+    }
+  }
+
   return (
-    <Router>
-      <div className="flex flex-col items-center w-screen min-h-screen bg-white">
-        <header className="fixed top-0 left-0 flex w-full">
-          {/* <Link className="p-1 text-sm cursor-pointer hover:bg-red-300" to="/">Home</Link>
-          <Link className="p-1 text-sm cursor-pointer hover:bg-red-300" to="/meals">Meals</Link>
-          <Link className="p-1 text-sm cursor-pointer hover:bg-red-300" to="/login">Login</Link> */}
-        </header>
-        <div
-          style={{minHeight: '400px'}}
-          className="relative w-full md:w-1/2"
-        >
-          <Switch>
-            <Route exact path="/">
-              <Home />
-            </Route>
-            <Route path="/meals">
-              <Meals />
-            </Route>
-            <Route path="/days/:id">
-              <Day />
-            </Route>
-            <Route path="/login">
-              <Login />
-            </Route>
-          </Switch>
+    <AppContext.Provider value={defaultHeader}>
+      <Router>
+        <div className="flex flex-col items-center w-screen min-h-screen bg-white">
+          <AppHeader />
+          <div
+            style={{minHeight: '400px'}}
+            className="relative w-full md:w-1/2"
+          >
+            <Switch>
+              <Route exact path="/">
+                <Home />
+              </Route>
+              <Route path="/meals">
+                <Meals />
+              </Route>
+              <Route path="/days/:id">
+                <Day />
+              </Route>
+              <Route path="/login">
+                <Login />
+              </Route>
+            </Switch>
+          </div>
         </div>
-      </div>
-    </Router>
+      </Router>
+    </AppContext.Provider>
   )
 }
 
