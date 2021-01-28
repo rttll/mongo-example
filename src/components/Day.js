@@ -97,7 +97,7 @@ function Day() {
                   exclude={day.meals} 
                   onItemClick={addMeal}
                   // style={{maxHeight: `30px`}} 
-                  className="flex flex-col h-full overflow-y-auto border border-gray-200 rounded-t-xl"
+                  className="flex flex-col h-full overflow-y-auto bg-white border border-gray-200 rounded-t-xl"
                 />
               </motion.div>
               }

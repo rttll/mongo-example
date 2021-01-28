@@ -70,7 +70,9 @@ function Home() {
         </AnimatePresence>
       </ul>
       <a href="#" onClick={ addDay } className="block p-4 my-8 text-lg text-center text-blue-400 bg-blue-100">+</a>
-      { days.length > 0 && <a href="#" onClick={ clear } className="inline-block p-4 my-8 text-lg text-red-600">X</a> }
+      <div className="p-1 bg-blue-600">
+        { days.length > 0 && <a href="#" onClick={ clear } className="inline-block p-4 my-8 text-lg text-red-600">X</a> }
+      </div>
     </>
   )
 }
