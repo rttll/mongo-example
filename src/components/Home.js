@@ -1,6 +1,9 @@
 import React, { useState, useEffect } from "react";
+import { AnimatePresence, motion } from "framer-motion";
 import moment from 'moment'
 import API from '../services/api'
+import { list } from '../util/motion'
+
 import {
   Link,
   useRouteMatch
@@ -10,7 +13,7 @@ function Home() {
   window.moment = moment
   const [addingDay, setaddingDay] = useState(false)
   const [days, setDays] = useState([])
-  
+
   let { path, url } = useRouteMatch();
   
   useEffect(() => {
@@ -49,14 +52,22 @@ function Home() {
   return (
     <>
       <ul className="">
-        {days.map(day => 
-          <li key={day._id}>
-            <Link to={`/days/${day._id}`} className="flex justify-between p-4 border-b border-gray-200 cursor-pointer hover:bg-gray-100">
-              <span className="text-sm">{day.date.format('dddd')}</span>
-              <span className="text-sm text-gray-400">{day.date.format('M/D')}</span>
-            </Link>
-          </li>
-        )}
+        <AnimatePresence>
+          {days.map((day, i) => 
+            <motion.li
+              key={day._id}
+              animate="visible"
+              initial="hidden"
+              variants={list}
+              custom={i}
+            >
+              <Link to={`/days/${day._id}`} className="flex justify-between p-4 border-b border-gray-200 cursor-pointer hover:bg-gray-100">
+                <span className="text-sm">{day.date.format('dddd')}</span>
+                <span className="text-sm text-gray-400">{day.date.format('M/D')}</span>
+              </Link>
+            </motion.li>
+          )}
+        </AnimatePresence>
       </ul>
       <a href="#" onClick={ addDay } className="block p-4 my-8 text-lg text-center text-blue-400 bg-blue-100">+</a>
       { days.length > 0 && <a href="#" onClick={ clear } className="inline-block p-4 my-8 text-lg text-red-600">X</a> }

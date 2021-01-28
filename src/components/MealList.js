@@ -35,8 +35,8 @@ function MealList(props) {
   }
 
   return (
-    <>
-      <ul className={props.className}>
+    <div className={props.className} style={props.style}>
+      <ul>
         {meals.map(meal => 
           <li key={meal._id}>
             <span onClick={ () => { props.onItemClick(meal._id) } } className={`${props.exclude.indexOf(meal._id) > -1 ? 'line-through text-gray-300' : ''} block p-4 px-8 cursor-pointer hover:bg-gray-100`}>{meal.name}</span>
@@ -55,7 +55,7 @@ function MealList(props) {
         </form>
       }
       <a href="#" onClick={ () => { setShowMealForm(!showMealForm) } } className="block p-4 my-8 text-lg text-center text-blue-400 bg-blue-100">+</a>
-    </>
+    </div>
   )
 }
 
