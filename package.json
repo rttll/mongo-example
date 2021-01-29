@@ -20,7 +20,7 @@
   },
   "scripts": {
     "start": "craco start",
-    "server": "NODE_ENV=development  nodemon ./api/index.js",
+    "server": "NODE_ENV=development  nodemon ./api/server.js",
     "build": "craco build",
     "test": "craco test",
     "eject": "react-scripts eject"
