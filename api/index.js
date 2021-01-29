@@ -25,16 +25,17 @@ const actions = {
 }
 
 app.all('*', async (req, res) => {
-  // log('index.js', req.url)
+  let url = req.url.replace(/\/api/, '')
+  // log('index.js', url)
   
-  if (req.url === '/') {
+  if (url === '/') {
     res.status(200).send(`OK [${process.env.NODE_ENV}]`)
   }
   
-  const action = actions[req.url.split('/')[1]]
+  const action = actions[url.split('/')[1]]
   // log('index.js action', action)
   if (action) {
-    req.query.method = req.url.split('/').pop().split('?')[0]
+    req.query.method = url.split('/').pop().split('?')[0]
     // log('method', req.query.method)
     await action(req, res)
   } else {

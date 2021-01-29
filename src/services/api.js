@@ -1,4 +1,4 @@
-const base = window.location.hostname === 'localhost' ? 'http://localhost:9000' : '/api'
+const base = window.location.hostname === 'localhost' ? 'http://localhost:9000/api' : '/api'
 const log = console.log
 const dispatch = (method, url, data = {}) => {
   
