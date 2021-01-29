@@ -63,9 +63,17 @@ function Day() {
     setIsAdding(false)
     if ( day.meals.indexOf(mealId) < 0) {
       API.patch('days', { id: id, day: {meals: day.meals.concat([mealId])} } )
-      .then((resp) => {
-        setDay({...resp.day, ...{date: moment(resp.day.date)}})
-      })
+        .then((resp) => {
+          if (resp.day) {
+            setDay({...resp.day, ...{date: moment(resp.day.date)}})
+          } else {
+            console.error('then err', resp)
+          }
+        }).catch((err) => {
+          console.error('catch err', err)
+        }).finally(() => {
+          console.log('patch request done')
+        })
     }
   }
 

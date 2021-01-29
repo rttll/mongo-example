@@ -11,9 +11,9 @@ import { clientsClaim } from 'workbox-core';
 import { ExpirationPlugin } from 'workbox-expiration';
 import { precacheAndRoute, createHandlerBoundToURL } from 'workbox-precaching';
 import { registerRoute } from 'workbox-routing';
-import { StaleWhileRevalidate } from 'workbox-strategies';
-import {CacheableResponsePlugin} from 'workbox-cacheable-response';
-
+import { StaleWhileRevalidate, NetworkOnly } from 'workbox-strategies';
+import { CacheableResponsePlugin } from 'workbox-cacheable-response';
+import { BackgroundSyncPlugin } from 'workbox-background-sync'
 
 clientsClaim();
 
@@ -89,20 +89,26 @@ registerRoute(
       }),
     ],
   }),
+  );
+  
+  /* Outbound requests */
+  
+  const bgSyncPlugin = new BackgroundSyncPlugin('api', {
+    maxRetentionTime: 24 * 60 // Retry for max of 24 Hours (specified in minutes)
+  });
+  
+registerRoute(
+  new RegExp('.+/api'),
+  new NetworkOnly({
+    plugins: [bgSyncPlugin]
+  }),
+  'POST'
 );
 
-/* Outbound requests */
-
-// const bgSyncPlugin = new BackgroundSyncPlugin('messageQueue', {
-//   maxRetentionTime: 24 * 60 // Retry for max of 24 Hours (specified in minutes)
-// });
-
-// let url = 'http://localhost:9000/create'
-// registerRoute(
-//   ({url}) => url === url,
-//   new NetworkOnly({
-//     plugins: [bgSyncPlugin]
-//   }),
-//   'POST'
-// );
-
+registerRoute(
+  new RegExp('.+/api'),
+  new NetworkOnly({
+    plugins: [bgSyncPlugin]
+  }),
+  'PATCH'
+);

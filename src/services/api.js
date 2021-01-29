@@ -15,10 +15,16 @@ const dispatch = (method, url, data = {}) => {
   let urlWithMethod = `${base}/${url.split('?')[0]}/${method.toLowerCase()}`
   urlWithMethod += `?${url.split('?').pop()}`
   // console.log(urlWithMethod)
-  return fetch(urlWithMethod, config)
-    .then((resp) => resp.json())
-    .then((json) => json)
-    .catch(err => console.error('errr', err))
+  try {
+    return fetch(urlWithMethod, config)
+      .then((resp) => resp.json())
+      .then((json) => json)
+      .catch((err) => {
+        return { error: err}
+      })
+    } catch (err) {
+    return { error: err}
+  }
 }
 
 const API = {
