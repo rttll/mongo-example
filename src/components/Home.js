@@ -19,36 +19,51 @@ function Home() {
   let thisMonthName = moment().format('MMMM')
 
   useEffect(() => {
-
-    makeGrid()
-    
-    context.set()
-    
+    context.set() // Sets header text to default 
     API.get('days')
-    .then((resp) => { 
-      setDays(resp.days.map(obj => {
-        return {...obj, ...{date: moment(obj.date)}}
-      }))
-    })
-    .catch(console.log)
+      .then((resp) => { 
+        let formatted = resp.days.map(obj => {
+          return {...obj, ...{date: moment(obj.date)}}
+        })
+        // setDays(formatted)
+        mergeDaysAndGrid(formatted)
+      })
+      .catch(console.log)
   }, [])
   
-  function makeGrid() {
-    let gridDate = moment().startOf('year')
-    let endOfYear = `${gridDate.format(`Y`)}-12-31`
-
-    let gridDates = []
-    while (gridDate.isSameOrBefore(endOfYear)) {
-      // console.log(gridDate.format('MMM Do, Y'))
-      gridDates.push({
-        dayOfYear: gridDate.dayOfYear(), 
-        date: gridDate.date(),
-        timestamp: gridDate.valueOf()
+  function mergeDaysAndGrid(days) {
+    makeGrid().then((grid) => {
+      let merged = grid.map((gridObj) => {
+        let filteredDays = days.filter(obj => obj.date.valueOf() === gridObj.timestamp)
+        let href = `/days/new/${gridObj.timestamp}`
+        let meals = []
+        if ( filteredDays.length > 0 ) {
+          let day = filteredDays[0]
+          meals = day.foo || []
+          href = `/days/show/${day._id}`
+        }
+        return {...gridObj, ...{href: href, meals: meals} }
       })
-      gridDate.add(1, 'day')
+      setGrid(merged)
+    })
+  }
 
-    }
-    setGrid(gridDates)
+  function makeGrid() {
+    return new Promise(function(resolve, reject) {
+      let gridDate = moment().startOf('year')
+      let endOfYear = `${gridDate.format(`Y`)}-12-31`
+  
+      let gridDates = []
+      while (gridDate.isSameOrBefore(endOfYear)) {
+        gridDates.push({
+          dayOfYear: gridDate.dayOfYear(), 
+          date: gridDate.date(),
+          timestamp: gridDate.valueOf()
+        })
+        gridDate.add(1, 'day')
+      }
+      resolve(gridDates)
+    })
   }
 
   function clear() {
@@ -70,31 +85,19 @@ function Home() {
         <div className="text-xs text-gray-300">sat</div>
         <div className="text-xs text-gray-300">sun</div>
         {grid.map(obj => 
-          <div key={obj.dayOfYear} className="relative py-4 border-b border-r border-gray-200">
-            { true &&
-              <>
-              <span className="absolute top-0 left-0 p-1 text-xs text-gray-500" style={{fontSize: '8px'}}>
-                { obj.date } 
-              </span>
-              <div className="flex px-2 pt-2 space-x-1">
-                <Link to={`/days/new/${obj.timestamp}`}>make</Link>
-                {/* {days.filter(d => parseInt(d.date.format('D')) === int).length > 0 &&
-                  <p>
-                    hi
-                    {[1, 2, 3].map(int => (
-                      <i key={int} className="w-1 h-1 bg-green-300 rounded-full"></i>
-                    ))}
-                  </p>
-                } */}
-              </div>
-              </>
-            }
-
-          </div>  
+          <Link 
+            to={obj.href}
+            key={obj.dayOfYear} className={`${obj.id ? 'bg-red-300' : ''} relative py-4 border-b border-r border-gray-200`}
+          >
+            <span className="absolute top-0 left-0 p-1 text-xs text-gray-500" style={{fontSize: '8px'}}>
+              { obj.date } 
+            </span>
+            { obj.meals.length }
+          </Link>
         )}
       </div>
 
-      <ul className="">
+      {/* <ul className="">
         <AnimatePresence>
           {days.map((day, i) => 
             <motion.li
@@ -111,7 +114,7 @@ function Home() {
             </motion.li>
           )}
         </AnimatePresence>
-      </ul>
+      </ul> */}
       <div className="p-1">
         { days.length > 0 && <a href="#" onClick={ clear } className="inline-block p-4 my-8 text-lg text-red-600">X</a> }
       </div>
