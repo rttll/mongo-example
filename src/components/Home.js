@@ -36,13 +36,13 @@ function Home() {
       let merged = grid.map((gridObj) => {
         let filteredDays = days.filter(obj => obj.date.valueOf() === gridObj.timestamp)
         let href = `/days/new/${gridObj.timestamp}`
-        let meals = []
+        let mealIds = []
         if ( filteredDays.length > 0 ) {
           let day = filteredDays[0]
-          meals = day.meals
+          mealIds = day.mealIds
           href = `/days/show/${day._id}`
         }
-        return {...gridObj, ...{href: href, meals: meals} }
+        return {...gridObj, ...{href: href, mealIds: mealIds} }
       })
       setGrid(merged)
     })
@@ -58,7 +58,8 @@ function Home() {
         gridDates.push({
           dayOfYear: gridDate.dayOfYear(), 
           date: gridDate.date(),
-          timestamp: gridDate.valueOf()
+          timestamp: gridDate.valueOf(),
+          isToday: gridDate.dayOfYear() === moment().dayOfYear()
         })
         gridDate.add(1, 'day')
       }
@@ -87,12 +88,16 @@ function Home() {
         {grid.map(obj => 
           <Link 
             to={obj.href}
-            key={obj.dayOfYear} className={`${obj.id ? 'bg-red-300' : ''} relative py-4 border-b border-r border-gray-200`}
+            key={obj.dayOfYear} className={`${obj.isToday ? 'bg-blue-100' : ''} relative py-4 border-b border-r border-gray-200`}
           >
             <span className="absolute top-0 left-0 p-1 text-xs text-gray-500" style={{fontSize: '8px'}}>
               { obj.date } 
             </span>
-            { obj.meals.length }
+            <div className="flex p-1 space-x-1">
+              {obj.mealIds.map(int => 
+                <i key={int} className="w-1 h-1 bg-green-200 rounded-full"></i>
+              )}
+            </div>
           </Link>
         )}
       </div>

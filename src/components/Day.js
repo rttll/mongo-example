@@ -54,7 +54,7 @@ function Day() {
 
   function createDay() {
     let date = moment(parseInt(slug))
-    API.post('days', {date: date.format('yyyy-MM-D')})
+    API.post('days', {date: date.valueOf()})
     .then(resp => {
         setDay({...resp.day, ...{date: date}})
         context.set(date.format('dddd'))
@@ -73,10 +73,10 @@ function Day() {
     .catch(console.error)
   }
 
-  function toggleMeal(mealId) {
+  function addOrRemoveMeal(mealId) {
     setIsAdding(false)
-    const meals = day.mealIds.indexOf(mealId) === -1 ? day.mealIds.concat([mealId]) : day.mealIds.filter(id => id !== mealId)
-    API.patch('days', { id: slug, day: {meals: meals } } )
+    const mealIds = day.mealIds.indexOf(mealId) === -1 ? day.mealIds.concat([mealId]) : day.mealIds.filter(id => id !== mealId)
+    API.patch('days', { id: slug, day: {mealIds: mealIds } } )
       .then((resp) => {
         if (resp.day) {
           setDay({...resp.day, ...{date: moment(resp.day.date)}})
@@ -101,7 +101,7 @@ function Day() {
                   <Link to={`/meals/${meal._id}`} className={`block p-4 flex-grow`}>
                     {meal.name}
                   </Link>
-                  <a href="#" onClick={ () => toggleMeal(meal._id) } className="flex items-center px-4 ">
+                  <a href="#" onClick={ () => addOrRemoveMeal(meal._id) } className="flex items-center px-4 ">
                     <span>X</span>
                   </a>
                 </li>
@@ -124,7 +124,7 @@ function Day() {
             >
               <MealList 
                 exclude={day.mealIds} 
-                onItemClick={ toggleMeal }
+                onItemClick={ addOrRemoveMeal }
                 className="flex flex-col h-full overflow-y-auto bg-white border border-gray-200 rounded-t-xl"
               />
             </motion.div>
