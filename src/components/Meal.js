@@ -1,6 +1,5 @@
 import React from "react";
 import {
-  Link,
   useParams,
   useHistory
 } from "react-router-dom";
@@ -10,7 +9,6 @@ function Meal() {
   let { mealId } = useParams();
   return (
     <div>
-      <span onClick={() => history.goBack()} className="block p-4 cursor-pointer">&larr; Back</span>
       <h1>{mealId}</h1>
     </div>
   )
