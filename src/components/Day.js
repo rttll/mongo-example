@@ -49,14 +49,6 @@ function Day() {
     let max = bgClasses.length - 1
     if (index > max) index = max
     let klass = bgClasses[index]
-    // if ( klass === undefined ) {
-    //   let dif = Math.abs(max - index)
-    //   let newIndex = max - dif
-    //   if ( newIndex < 0) {
-    //     newIndex = Math.max(max, Math.abs(newIndex))
-    //   }
-    //   klass = bgClasses[newIndex]
-    // }
     return klass
   }
 
