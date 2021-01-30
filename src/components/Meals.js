@@ -40,7 +40,7 @@ function Meals() {
           )}
         </ul>
       </Route>
-      <Route path={`${path}/:mealId`}>
+      <Route path={`${path}/:id`}>
         <Meal />
       </Route>
     </Switch>

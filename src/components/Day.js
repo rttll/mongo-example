@@ -35,6 +35,7 @@ function Day() {
 
   useEffect(() => {
     context.set('Loading...')
+    console.log(id)
     API.get('days?id=' + id)
       .then((resp) => {
         let date = moment(resp.day.date)

@@ -10,6 +10,7 @@ async function setup() {
 }
 
 const getOneMeal = async (id) => {
+  console.log(id)
   const meal = await collection.findOne({_id: parseInt(id)})
   return { meal }
 }
@@ -21,6 +22,7 @@ const getMeals = async () => {
 
 const methods = {
   get: async (req, res) => {
+    console.log(req.query.id)
     const resp = req.query.id ? await getOneMeal(req.query.id) : await getMeals()
     res.status(200).json( resp )
   },
@@ -36,8 +38,8 @@ const methods = {
     res.status(200).json(result)
   },
   delete: async (req, res) => {
-    const result = await collection.deleteMany(req.body.docs)
-    res.status(200).json(result)
+    const result = await collection.deleteOne({_id: parseInt(req.body.id)})
+    res.status(200).json({deleted: result.deletedCount})
   }
 }
 
