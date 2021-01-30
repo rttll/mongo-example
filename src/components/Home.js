@@ -39,7 +39,7 @@ function Home() {
         let meals = []
         if ( filteredDays.length > 0 ) {
           let day = filteredDays[0]
-          meals = day.foo || []
+          meals = day.meals
           href = `/days/show/${day._id}`
         }
         return {...gridObj, ...{href: href, meals: meals} }

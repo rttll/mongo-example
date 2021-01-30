@@ -12,8 +12,8 @@ async function setup() {
 const getOneDay = async (id) => {
   const day = await daysCollection.findOne({_id: parseInt(id)})
   const mealsCollection = await db.collection('meals')
-  const foo = await mealsCollection.find( { _id: { $in: day.meals } })
-  day.foo = await foo.toArray()
+  const meals = await mealsCollection.find( { _id: { $in: day.mealIds } })
+  day.meals = await meals.toArray()
   return { day }
 }
 
@@ -32,7 +32,7 @@ const methods = {
     const result = await daysCollection.insertOne({
       _id: id,
       date: req.body.date,
-      meals: [],
+      mealIds: [],
     })
     // todo remove second request here
     let resp = await getOneDay(id)

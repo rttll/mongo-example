@@ -75,7 +75,7 @@ function Day() {
 
   function toggleMeal(mealId) {
     setIsAdding(false)
-    const meals = day.meals.indexOf(mealId) === -1 ? day.meals.concat([mealId]) : day.meals.filter(id => id !== mealId)
+    const meals = day.mealIds.indexOf(mealId) === -1 ? day.mealIds.concat([mealId]) : day.mealIds.filter(id => id !== mealId)
     API.patch('days', { id: slug, day: {meals: meals } } )
       .then((resp) => {
         if (resp.day) {
@@ -95,8 +95,8 @@ function Day() {
       <Switch>
         <Route path={path}>
           <ul>
-            { day && day.foo.length > 0 &&
-              day.foo.map((meal, index) => 
+            { day && day.meals.length > 0 &&
+              day.meals.map((meal, index) => 
                 <li key={meal._id} className={`${bgName(index)} flex items-stretch`}>
                   <Link to={`/meals/${meal._id}`} className={`block p-4 flex-grow`}>
                     {meal.name}
@@ -123,7 +123,7 @@ function Day() {
               className="absolute top-0 z-20 flex flex-col w-full h-screen pt-20 overflow-hidden"
             >
               <MealList 
-                exclude={day.meals} 
+                exclude={day.mealIds} 
                 onItemClick={ toggleMeal }
                 className="flex flex-col h-full overflow-y-auto bg-white border border-gray-200 rounded-t-xl"
               />
