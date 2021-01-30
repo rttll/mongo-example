@@ -9,6 +9,7 @@ import {
   Link,
   useParams,
   useRouteMatch,
+  useHistory
 } from "react-router-dom";
 import MealList from './MealList'
 import { AnimatePresence, motion } from "framer-motion";
@@ -26,25 +27,14 @@ const bgClasses = [
 ]
 
 function Day() {
-  let { id } = useParams();
+  let { action, slug } = useParams();
+  const history = useHistory()
   const { path, url } = useRouteMatch(); 
   const [day, setDay] = useState(null)
   const [meals, setMeals] = useState([])
   const [isAdding, setIsAdding] = useState(false)
   const context = useContext(AppContext)
 
-  useEffect(() => {
-    context.set('Loading...')
-    console.log(id)
-    API.get('days?id=' + id)
-      .then((resp) => {
-        let date = moment(resp.day.date)
-        setDay({...resp.day, ...{date: date}})
-        context.set(date.format('dddd'))
-      })
-      .catch(console.error)
-  }, [])  
-  
   const bgName = (index) => {
     let max = bgClasses.length - 1
     if (index > max) index = max
@@ -52,10 +42,41 @@ function Day() {
     return klass
   }
 
+  useEffect(() => {
+    context.set('Loading...')
+    if ( action === 'show' ) {
+      fetchDay()
+    } else {
+      createDay()
+    }
+   
+  }, [])  
+
+  function createDay() {
+    let date = moment(parseInt(slug))
+    API.post('days', {date: date.format('yyyy-MM-D')})
+    .then(resp => {
+        setDay({...resp.day, ...{date: date}})
+        context.set(date.format('dddd'))
+        history.replace(`/days/show/${resp.day._id}`)
+      })
+      .catch(console.log)
+  }
+
+  function fetchDay() {
+    API.get('days?id=' + slug)
+    .then((resp) => {
+      let date = moment(resp.day.date)
+      setDay({...resp.day, ...{date: date}})
+      context.set(date.format('dddd'))
+    })
+    .catch(console.error)
+  }
+
   function toggleMeal(mealId) {
     setIsAdding(false)
     const meals = day.meals.indexOf(mealId) === -1 ? day.meals.concat([mealId]) : day.meals.filter(id => id !== mealId)
-    API.patch('days', { id: id, day: {meals: meals } } )
+    API.patch('days', { id: slug, day: {meals: meals } } )
       .then((resp) => {
         if (resp.day) {
           setDay({...resp.day, ...{date: moment(resp.day.date)}})

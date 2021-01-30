@@ -41,7 +41,7 @@ function App() {
               <Route path="/meals">
                 <Meals />
               </Route>
-              <Route path="/days/:id">
+              <Route path="/days/:action/:slug">
                 <Day />
               </Route>
               <Route path="/login">

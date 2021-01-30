@@ -12,7 +12,6 @@ import {
 
 function Home() {
   window.moment = moment
-  const [addingDay, setaddingDay] = useState(false)
   const [days, setDays] = useState([])
   const [grid, setGrid] = useState([])
   const context = useContext(AppContext)
@@ -41,7 +40,11 @@ function Home() {
     let gridDates = []
     while (gridDate.isSameOrBefore(endOfYear)) {
       // console.log(gridDate.format('MMM Do, Y'))
-      gridDates.push({dayOfYear: gridDate.dayOfYear(), date: gridDate.date()})
+      gridDates.push({
+        dayOfYear: gridDate.dayOfYear(), 
+        date: gridDate.date(),
+        timestamp: gridDate.valueOf()
+      })
       gridDate.add(1, 'day')
 
     }
@@ -53,22 +56,6 @@ function Home() {
       .then((resp) => {
         setDays([])
       })
-  }
-
-  function addDay() {
-    if ( addingDay ) return;
-    setaddingDay(true)
-    
-    let date = days.length > 0 ? 
-      moment(days[days.length - 1].date).add(1, 'day').format('yyyy-MM-D') :
-      moment().format('yyyy-MM-D')
-    API.post('days', {date: date})
-      .then(day => {
-        day.date = moment(day.date)
-        setDays(days.concat([day]))
-        setaddingDay(false)
-      })
-      .catch(console.log)
   }
   
   return (
@@ -90,6 +77,7 @@ function Home() {
                 { obj.date } 
               </span>
               <div className="flex px-2 pt-2 space-x-1">
+                <Link to={`/days/new/${obj.timestamp}`}>make</Link>
                 {/* {days.filter(d => parseInt(d.date.format('D')) === int).length > 0 &&
                   <p>
                     hi
@@ -116,7 +104,7 @@ function Home() {
               variants={list}
               custom={i}
             >
-              <Link to={`/days/${day._id}`} className="flex justify-between p-4 border-b border-gray-200 cursor-pointer hover:bg-gray-100">
+              <Link to={`/days/show/${day._id}`} className="flex justify-between p-4 border-b border-gray-200 cursor-pointer hover:bg-gray-100">
                 <span className="text-sm">{day.date.format('dddd')}</span>
                 <span className="text-sm text-gray-400">{day.date.format('M/D')}</span>
               </Link>
@@ -124,7 +112,6 @@ function Home() {
           )}
         </AnimatePresence>
       </ul>
-      <a href="#" onClick={ addDay } className="block p-4 my-8 text-lg text-center text-blue-400 bg-blue-100">+</a>
       <div className="p-1">
         { days.length > 0 && <a href="#" onClick={ clear } className="inline-block p-4 my-8 text-lg text-red-600">X</a> }
       </div>

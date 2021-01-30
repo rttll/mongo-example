@@ -28,12 +28,15 @@ const methods = {
     res.status(200).json( resp )
   },
   post: async (req, res) => {
+    let id = await getId('days')
     const result = await daysCollection.insertOne({
-      _id: await getId('days'),
+      _id: id,
       date: req.body.date,
-      meals: []
+      meals: [],
     })
-    res.status(200).json(result.ops[0])
+    // todo remove second request here
+    let resp = await getOneDay(id)
+    res.status(200).json( resp )
   },
   patch: async (req, res) => {
     const result = await daysCollection.updateOne({_id: parseInt(req.body.id)}, { $set: req.body.day })
