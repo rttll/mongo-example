@@ -59,22 +59,21 @@ function Day() {
     return klass
   }
 
-  function addMeal(mealId) {
+  function toggleMeal(mealId) {
     setIsAdding(false)
-    if ( day.meals.indexOf(mealId) < 0) {
-      API.patch('days', { id: id, day: {meals: day.meals.concat([mealId])} } )
-        .then((resp) => {
-          if (resp.day) {
-            setDay({...resp.day, ...{date: moment(resp.day.date)}})
-          } else {
-            console.error('then err', resp)
-          }
-        }).catch((err) => {
-          console.error('catch err', err)
-        }).finally(() => {
-          console.log('patch request done')
-        })
-    }
+    const meals = day.meals.indexOf(mealId) === -1 ? day.meals.concat([mealId]) : day.meals.filter(id => id !== mealId)
+    API.patch('days', { id: id, day: {meals: meals } } )
+      .then((resp) => {
+        if (resp.day) {
+          setDay({...resp.day, ...{date: moment(resp.day.date)}})
+        } else {
+          console.error('then err', resp)
+        }
+      }).catch((err) => {
+        console.error('catch err', err)
+      }).finally(() => {
+        console.log('patch request done')
+      })
   }
 
   return (
@@ -84,10 +83,13 @@ function Day() {
           <ul>
             { day && day.foo.length > 0 &&
               day.foo.map((meal, index) => 
-                <li key={meal._id}>
-                  <Link to={`/meals/${meal._id}`} className={`${bgName(index)} block p-4`}>
+                <li key={meal._id} className={`${bgName(index)} flex items-stretch`}>
+                  <Link to={`/meals/${meal._id}`} className={`block p-4 flex-grow`}>
                     {meal.name}
                   </Link>
+                  <a href="#" onClick={ () => toggleMeal(meal._id) } className="flex items-center px-4 ">
+                    <span>X</span>
+                  </a>
                 </li>
               )
             }
@@ -108,7 +110,7 @@ function Day() {
             >
               <MealList 
                 exclude={day.meals} 
-                onItemClick={addMeal}
+                onItemClick={ toggleMeal }
                 className="flex flex-col h-full overflow-y-auto bg-white border border-gray-200 rounded-t-xl"
               />
             </motion.div>
