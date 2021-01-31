@@ -32,7 +32,7 @@ function App() {
           <AppHeader />
           <div
             style={{minHeight: '400px'}}
-            className="relative w-full md:w-1/2"
+            className="relative w-full"
           >
             <Switch>
               <Route exact path="/">
