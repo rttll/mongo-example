@@ -10,7 +10,6 @@ async function setup() {
 }
 
 const getOneMeal = async (id) => {
-  console.log(id)
   const meal = await collection.findOne({_id: parseInt(id)})
   return { meal }
 }
@@ -35,7 +34,9 @@ const methods = {
   },
   patch: async (req, res) => {
     const result = await collection.updateOne({_id: parseInt(req.body.id)}, { $set: req.body.meal })
-    res.status(200).json(result)
+    // console.log(result.modifiedCount, result)
+    const meal = await getOneMeal(req.body.id)
+    res.status(200).json(meal)
   },
   delete: async (req, res) => {
     const result = await collection.deleteOne({_id: parseInt(req.body.id)})

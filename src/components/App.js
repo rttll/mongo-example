@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import {
   BrowserRouter as Router,
   Switch,
@@ -24,6 +24,12 @@ function App() {
       setHeaderText(text)
     }
   }
+
+  useEffect(() => {
+    window.addEventListener('scroll', () => {
+      
+    })
+  }, [])
 
   return (
     <AppContext.Provider value={defaultHeader}>

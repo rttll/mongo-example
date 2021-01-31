@@ -1,18 +1,11 @@
 import React, { useEffect, useState } from "react";
-import {
-  BrowserRouter as Router,
-  Switch,
-  Route,
-  Link,
-  useParams,
-  useRouteMatch
-} from "react-router-dom";
+import { Switch, Route, useRouteMatch } from "react-router-dom";
 import API from '../services/api'
 import Meal from './Meal'
 
 function Meals() {
   const [meals, setMeals] = useState([])
-  const { path, url } = useRouteMatch();
+  const { path } = useRouteMatch();
 
   useEffect(() => {
     API.get('meals')
@@ -40,7 +33,7 @@ function Meals() {
           )}
         </ul>
       </Route>
-      <Route path={`${path}/:id`}>
+      <Route path={[`/meals/:id/`, `/meals/:id/edit`]}>
         <Meal />
       </Route>
     </Switch>
