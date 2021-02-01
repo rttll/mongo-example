@@ -16,8 +16,9 @@ function Home() {
   const [days, setDays] = useState([])
   const [grid, setGrid] = useState([])
   const context = useContext(AppContext)
-  let { path, url } = useRouteMatch();
-  let thisMonthName = moment().format('MMMM')
+  const dayNames = times(7, i => moment().startOf('week').add(i+1, 'days').format('ddd') )
+  const { path, url } = useRouteMatch();
+
 
   useEffect(() => {
     context.set() // Sets header text to default 
@@ -26,7 +27,6 @@ function Home() {
         let formatted = resp.days.map(obj => {
           return {...obj, ...{date: moment(obj.date)}}
         })
-        // setDays(formatted)
         mergeDaysAndGrid(formatted)
       })
       .catch(console.log)
@@ -82,7 +82,8 @@ function Home() {
         }
         curMonth.dates.push({
           id: gridDate.dayOfYear(), 
-          date: gridDate.format('ddd, MMM') + ' ' + gridDate.date(),
+          date: gridDate.date(),
+          // date: gridDate.format('ddd, MMM') + ' ' + gridDate.date(),
           timestamp: gridDate.valueOf(),
           isToday: gridDate.dayOfYear() === moment().dayOfYear()
         })
@@ -107,21 +108,21 @@ function Home() {
   return (
     <>
       {grid.map((month, i) =>
-        <div key={month.name}>
-          <h1 className="px-1 py-4 text-xs text-gray-600">{month.name}</h1>
-          <div className="grid grid-cols-7">
-            <div className="text-xs text-gray-300">mon</div>
-            <div className="text-xs text-gray-300">tue</div>
-            <div className="text-xs text-gray-300">wed</div>
-            <div className="text-xs text-gray-300">thur</div>
-            <div className="text-xs text-gray-300">fri</div>
-            <div className="text-xs text-gray-300">sat</div>
-            <div className="text-xs text-gray-300">sun</div>
-            
+        <div key={month.name} className="flex flex-col h-screen">
+          <header className="sticky z-10 pt-1 pb-2 bg-white" style={{top: '40px'}}>
+            <h1 className="px-1 py-1 text-xs text-gray-600 uppercase bg-white">{month.name}</h1>
+            <div className="grid flex-grow grid-cols-7">
+              {dayNames.map((name) => 
+                <div key={name} className="flex-shrink pl-1 text-xs text-gray-300">{name}</div>
+              )}
+            </div>
+          </header>
+          <div className="grid flex-grow grid-cols-7">
             {month.dates.map((obj) =>
               <Link 
                 to={obj.href}
                 key={obj.id} 
+                data-today={obj.isToday}
                 className={`${obj.isToday ? 'bg-yellow-100' : ''} relative py-4 border-b border-r border-gray-200 hover:bg-blue-50`}
               >
                 <span className="absolute top-0 left-0 p-1 text-xs text-gray-500" style={{fontSize: '8px'}}>

@@ -14,7 +14,7 @@ function AppHeader() {
   }
 
   return (
-    <header className="flex items-center justify-center w-full">
+    <header className="z-20 flex items-center justify-center w-full">
       <i className="py-3 m-0 text-xs leading-none">&nbsp;</i>
       <div className="fixed top-0 left-0 z-10 w-full bg-gray-700">
         <div className="relative">
