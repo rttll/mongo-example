@@ -68,13 +68,12 @@ function Day() {
     .then((resp) => {
       let date = moment(resp.day.date)
       setDay({...resp.day, ...{date: date}})
-      context.set(date.format('dddd'))
+      context.set(date.format('dddd, MMM D'))
     })
     .catch(console.error)
   }
 
   function addOrRemoveMeal(mealId) {
-    setIsAdding(false)
     const mealIds = day.mealIds.indexOf(mealId) === -1 ? day.mealIds.concat([mealId]) : day.mealIds.filter(id => id !== mealId)
     API.patch('days', { id: slug, day: {mealIds: mealIds } } )
       .then((resp) => {
@@ -124,8 +123,9 @@ function Day() {
             >
               <MealList 
                 exclude={day.mealIds} 
+                closeSelf={(e) => setIsAdding(false)}
                 onItemClick={ addOrRemoveMeal }
-                className="flex flex-col h-full overflow-y-auto bg-white border border-gray-200 rounded-t-xl"
+                className="flex flex-col overflow-hidden bg-white border border-gray-200 rounded-t-xl"
               />
             </motion.div>
             }
