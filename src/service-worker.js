@@ -11,7 +11,7 @@ import { clientsClaim } from 'workbox-core';
 import { ExpirationPlugin } from 'workbox-expiration';
 import { precacheAndRoute, createHandlerBoundToURL } from 'workbox-precaching';
 import { registerRoute } from 'workbox-routing';
-import { StaleWhileRevalidate, NetworkOnly } from 'workbox-strategies';
+import { StaleWhileRevalidate, NetworkFirst, NetworkOnly } from 'workbox-strategies';
 import { CacheableResponsePlugin } from 'workbox-cacheable-response';
 import { BackgroundSyncPlugin } from 'workbox-background-sync'
 
@@ -82,7 +82,7 @@ self.addEventListener('activate', () => {
 // Cache api GET requests
 registerRoute(
   new RegExp('.+/api'),
-  new StaleWhileRevalidate({
+  new NetworkFirst({
     cacheName: 'data',
     plugins: [
       new CacheableResponsePlugin({

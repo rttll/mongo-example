@@ -46,7 +46,7 @@ function MealList(props) {
           {meals.map(meal => 
             <li key={meal._id} className="bg-white border-b border-gray-300">
               <span 
-                onClick={ () => { props.onItemClick(meal._id) } } 
+                onClick={ (e) => { props.onItemClick(e, meal._id) } } 
                 className={`flex justify-between p-4 cursor-pointer hover:bg-gray-100 ${props.exclude.indexOf(meal._id) > -1 ? 'line-through text-gray-300' : ''} `}
               >
                 <span>{meal.name}</span>

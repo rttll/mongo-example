@@ -73,7 +73,8 @@ function Day() {
     .catch(console.error)
   }
 
-  function addOrRemoveMeal(mealId) {
+  function addOrRemoveMeal(event, mealId) {
+    event.preventDefault()
     const mealIds = day.mealIds.indexOf(mealId) === -1 ? day.mealIds.concat([mealId]) : day.mealIds.filter(id => id !== mealId)
     API.patch('days', { id: slug, day: {mealIds: mealIds } } )
       .then((resp) => {
@@ -100,8 +101,8 @@ function Day() {
                   <Link to={`/meals/${meal._id}`} className={`block p-4 flex-grow`}>
                     {meal.name}
                   </Link>
-                  <a href="#" onClick={ () => addOrRemoveMeal(meal._id) } className="flex items-center px-4 ">
-                    <span>X</span>
+                  <a href="#" onClick={ (event) => addOrRemoveMeal(event, meal._id) } className="flex items-center px-4 ">
+                    <span>&times;</span>
                   </a>
                 </li>
               )
