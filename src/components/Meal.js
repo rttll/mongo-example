@@ -99,19 +99,23 @@ function Meal() {
                 onChange={handleMealChange} 
                 name="name"
                 value={meal.name} /> : 
-              <h1 className="p-4 text-sm border border-transparent">{ meal.name }</h1>  
+              <h1 className="p-4 border border-transparent">{ meal.name }</h1>  
             }
-            <Link to={`/meals/${params.id}/edit`} className="p-4 text-xs">Edit</Link>
+            <Link
+              to={`/meals/${params.id}/edit`}
+              className="p-4 text-xs">Edit</Link>
           </div>
           <div>
-            {isEditMode ?
+            {meal.link && !isEditMode &&
+              <a href={meal.link} className="inline-block p-4 text-blue-500">Recipe</a>
+            }
+            {isEditMode &&
               <input 
-                type="text" 
-                className="p-2 m-2 text-sm border border-gray-400 rounded" 
-                onChange={handleMealChange} 
-                name="link"
-                value={meal.link} /> : 
-              <h1 className="p-4 text-sm border border-transparent">{ meal.link }</h1>  
+              type="text" 
+              className="p-2 m-2 text-sm border border-gray-400 rounded" 
+              onChange={handleMealChange} 
+              name="link"
+              value={meal.link} />
             }
             {isEditMode ?
               <textarea 
@@ -125,7 +129,10 @@ function Meal() {
           </div>
           {isEditMode &&
             <div className="flex flex-row">
-              <a href="#" onClick={ destroy } className="inline-block p-4 text-xs text-red-500">
+              <a
+                href="#"
+                onClick={destroy}
+                className="inline-block p-4 text-xs text-red-500">
                 {deleteConfirmation === 0 ? 'Delete' : 'Delete Now'}
               </a>
               {deleteConfirmation > 0 &&
