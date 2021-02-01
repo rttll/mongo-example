@@ -17,9 +17,7 @@ function Home() {
   const [grid, setGrid] = useState([])
   const context = useContext(AppContext)
   const dayNames = times(7, i => moment().startOf('week').add(i+1, 'days').format('ddd') )
-  const { path, url } = useRouteMatch();
-
-
+  
   useEffect(() => {
     context.set() // Sets header text to default 
     API.get('days')
@@ -32,6 +30,15 @@ function Home() {
       .catch(console.log)
   }, [])
   
+  useEffect(() => {
+    if (grid.length > 0) {
+      setTimeout(() => {
+        const rect = document.getElementById('today').getBoundingClientRect()
+        window.scrollTo(0, rect.top - 100)
+      }, 0);
+    }
+  }, [grid])
+
   function mergeDaysAndGrid(days) {
     makeGrid().then((grid) => {
       let merged = grid.map((month) => {
@@ -113,7 +120,7 @@ function Home() {
             <h1 className="px-1 py-1 text-xs text-gray-600 uppercase bg-white">{month.name}</h1>
             <div className="grid flex-grow grid-cols-7">
               {dayNames.map((name) => 
-                <div key={name} className="flex-shrink pl-1 text-xs text-gray-300">{name}</div>
+                <div key={name} className="flex-shrink pl-1 text-xs text-gray-500">{name}</div>
               )}
             </div>
           </header>
@@ -122,10 +129,10 @@ function Home() {
               <Link 
                 to={obj.href}
                 key={obj.id} 
-                data-today={obj.isToday}
+                id={ obj.isToday ? 'today' : ''}
                 className={`${obj.isToday ? 'bg-yellow-100' : ''} relative py-4 border-b border-r border-gray-200 hover:bg-blue-50`}
               >
-                <span className="absolute top-0 left-0 p-1 text-xs text-gray-500" style={{fontSize: '8px'}}>
+                <span className="absolute top-0 left-0 p-1 text-xs text-gray-500">
                   { obj.date } 
                 </span>
                 <div className="flex p-1 space-x-1">

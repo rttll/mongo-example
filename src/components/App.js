@@ -25,12 +25,6 @@ function App() {
     }
   }
 
-  useEffect(() => {
-    window.addEventListener('scroll', () => {
-      
-    })
-  }, [])
-
   return (
     <AppContext.Provider value={defaultHeader}>
       <Router>
