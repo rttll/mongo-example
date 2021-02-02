@@ -28,7 +28,7 @@ function App() {
   return (
     <AppContext.Provider value={defaultHeader}>
       <Router>
-        <div className="flex flex-col items-center w-screen min-h-screen bg-white">
+        <div className="flex flex-col items-center w-screen bg-white">
           <AppHeader />
           <div
             style={{minHeight: '400px'}}
