@@ -3,16 +3,10 @@ import moment from 'moment'
 import API from '../services/api'
 import AppContext from '../services/app-context'
 
-import {
-  Switch,
-  Route,
-  Link,
-  useParams,
-  useRouteMatch,
-  useHistory
-} from "react-router-dom";
+import { Switch, Route, Link, useParams, useRouteMatch, useHistory } from "react-router-dom";
 import MealList from './MealList'
 import { AnimatePresence, motion } from "framer-motion";
+import { Frame, Stack, Scroll } from 'framer'
 import { slideUp } from '../util/motion'
 import Sortable from "sortablejs";
 
@@ -26,6 +20,8 @@ const bgClasses = [
   // 'bg-green-600',
   // 'bg-green-700',
 ]
+
+
 
 function Day() {
   let { action, slug } = useParams();
@@ -43,6 +39,16 @@ function Day() {
     let klass = bgClasses[index]
     return klass
   }
+
+  const body = document.getElementsByTagName('body')[0]
+
+  useEffect(() => {
+    if ( isAdding ) {
+      body.style.overflow = 'hidden'
+    } else {
+      body.style.overflow = 'auto'
+    }
+  }, [isAdding])
 
   useEffect(() => {
     context.set('Loading...')
@@ -141,51 +147,74 @@ function Day() {
     <>
       <Switch>
         <Route path={path}>
-          <ul id="meal-list">
-            { day && day.meals.length > 0 &&
-              day.meals.map((meal, index) => 
-                <li key={meal._id} data-id={meal._id} className={`border-b border-gray-300 flex items-stretch`}>
-                  <Link to={`/meals/${meal._id}`} className={`block p-4 flex-grow`}>
-                    {meal.name}
-                  </Link>
-                  <a href="#" onClick={ (event) => addOrRemoveMeal(event, meal._id) } className="flex items-center px-4 ">
-                    <span>&times;</span>
-                  </a>
-                </li>
-              )
-            }
-          </ul>
-          <a href="" className="block p-4" onClick={(e) => {e.preventDefault(); setIsAdding(true)} }>Add</a>
-        
-        <AnimatePresence>
-          {day && isAdding && 
-            <motion.div
-              key="card"
-              animate="visible"
-              initial="hidden"
-              exit="hidden"
-              variants={slideUp}
-              custom={document.documentElement.clientHeight - 40}
-              onClick={ (e) => { e.currentTarget === e.target ? setIsAdding(false) : '' }}
-              className="absolute top-0 z-20 flex flex-col w-full h-screen pt-20 overflow-hidden"
-            >
-              <MealList 
-                exclude={day.mealIds} 
-                closeSelf={(e) => setIsAdding(false)}
-                onItemClick={ addOrRemoveMeal }
-                className="flex flex-col overflow-hidden bg-white border border-gray-200 rounded-t-xl"
-              />
-            </motion.div>
-            }
-          </AnimatePresence>
+          <div className="absolute inset-0 z-10">
+            <ul id="meal-list">
+              { day && day.meals.length > 0 &&
+                day.meals.map((meal, index) => 
+                  <li key={meal._id} data-id={meal._id} className={`border-b border-gray-300 flex items-stretch`}>
+                    <Link to={`/meals/${meal._id}`} className={`block p-4 flex-grow`}>
+                      {meal.name}
+                    </Link>
+                    <a href="#" onClick={ (event) => addOrRemoveMeal(event, meal._id) } className="flex items-center px-4 ">
+                      <span>&times;</span>
+                    </a>
+                  </li>
+                )
+              }
+            </ul>
+            <a href="" className="block p-4" onClick={(e) => {e.preventDefault(); setIsAdding(true)} }>Add</a>
 
-          { isAdding && 
-            <motion.div 
-              initial={{opacity: 0}}
-              animate={{opacity: .5}}
-              className="fixed inset-0 z-10 w-full h-screen bg-gray-700"
-              onClick={(e) => {e.currentTarget === e.target ? setIsAdding(false) : ''} }
-            />
+          </div>
+        
+          {day && isAdding && 
+            <Stack
+              direction='vertical'
+              gap={0}
+              width={'100%'}
+              animate={{y: 0, opacity: 1}}
+              initial={{y: 100, opacity: 0}}
+              className="z-30"
+              >
+            
+              <Frame
+                className="z-30 opacity-30"
+                width={'100%'}
+                backgroundColor="#222"
+                height={100}
+                onClick={(e) => setIsAdding(false)}
+                data-spacer>
+              </Frame>
+              <Frame
+                className="rounded-t-xl"
+                width={'100%'}
+              >
+                <Stack
+                  gap={0}
+                  width={'100%'}
+                >
+                  <Frame
+                    height={50}
+                    width={'100%'}
+                    backgroundColor="#fff"
+                    className="rounded-t-xl"
+                  >
+                    <div className="relative flex h-full shadow-md">
+                      <div className="absolute top-0 z-10 w-full h-4 opacity-30" style={{background: '#222'}}></div>
+                      <div className="z-20 flex items-center justify-between flex-grow bg-white border border-gray-300 rounded-t-xl">
+                        <h1 className="p-4 font-medium">Meals</h1>
+                        <span className="p-4" onClick={() => {setIsAdding(false)}}>&times;</span>
+                      </div>
+                    </div>
+                  </Frame>
+                    <MealList 
+                      exclude={day.mealIds} 
+                      closeSelf={(e) => setIsAdding(false)}
+                      onItemClick={ addOrRemoveMeal }
+                      className="bg-white"
+                    />
+                </Stack>
+              </Frame>
+            </Stack>
           }
         
         </Route>

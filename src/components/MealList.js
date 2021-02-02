@@ -1,10 +1,16 @@
 import React, { useState, useEffect } from "react";
+import { Frame, Scroll } from 'framer'
 import API from '../services/api'
 
 function MealList(props) {
   const [meals, setMeals] = useState([])
   const [addingMeal, setAddingMeal] = useState(false)
   const [mealName, setMealName] = useState('')
+
+  const scrollFrameHeight = () => {
+    document.getElementsByTagName('body')[0].style.overflow = 'hidden'
+    return window.innerHeight - 100 - document.getElementById('app-header').clientHeight
+  }
 
   useEffect(() => {
     API.get('meals')
@@ -34,17 +40,21 @@ function MealList(props) {
   }
 
   return (
-    <div className={`${props.className} flex flex-col`} style={props.style}>
-      <header className="flex items-center justify-between bg-gray-100 border-b border-gray-200">
-        <h1 className="p-4 text-sm font-medium leading-none">Meals</h1>
-        {props.closeSelf && 
-          <a href="#" onClick={ props.closeSelf } className="inline-block p-4 text-sm">&times;</a>
-        }
-      </header>
-      <div className="flex-grow pb-20 overflow-y-auto">
-        <ul>
+      <Frame
+        width="100%"
+        // height="100%"
+        className={props.className}
+        backgroundColor="blue"
+      >
+        <Scroll
+          height={scrollFrameHeight()}
+          id="items"
+          backgroundColor="#fff"
+          className="border-l border-r border-gray-300"
+          width="100%"
+        >
           {meals.map(meal => 
-            <li key={meal._id} className="bg-white border-b border-gray-300">
+            <Frame height={50} width="100%" key={meal._id} backgroundColor="#fff" className="bg-white border-b border-gray-300">
               <span 
                 onClick={ (e) => { props.onItemClick(e, meal._id) } } 
                 className={`flex justify-between p-4 cursor-pointer hover:bg-gray-100 ${props.exclude.indexOf(meal._id) > -1 ? 'line-through text-gray-300' : ''} `}
@@ -54,24 +64,12 @@ function MealList(props) {
                   <span>+</span>
                 }
               </span>
-            </li>
+            </Frame>
           )}
-        </ul>
-        <form action="/meals" onSubmit={createMeal}>
-          <div className="flex justify-between border-b border-gray-300">
-            <input 
-              type="text" 
-              className="block w-full p-4"
-              value={mealName}
-              onChange={ (e) => setMealName(e.target.value) }
-              placeholder="Create new meal"
-            />
-            <button type="submit" className="p-4">+</button>
-          </div>
-        </form>
-      </div>
+          <Frame height={100}  backgroundColor="#fff"></Frame>
 
-    </div>
+        </Scroll>
+      </Frame>
   )
 }
 
