@@ -14,6 +14,7 @@ import {
 import MealList from './MealList'
 import { AnimatePresence, motion } from "framer-motion";
 import { slideUp } from '../util/motion'
+import Sortable from "sortablejs";
 
 // Classnames need to be stored explicity, or PurgeCSS will not include them.
 const bgClasses = [
@@ -33,6 +34,7 @@ function Day() {
   const [day, setDay] = useState(null)
   const [meals, setMeals] = useState([])
   const [isAdding, setIsAdding] = useState(false)
+  const [sortable, setSortable] = useState(null)
   const context = useContext(AppContext)
 
   const bgName = (index) => {
@@ -45,14 +47,32 @@ function Day() {
   useEffect(() => {
     context.set('Loading...')
     if ( action === 'show' ) {
-      fetchDay()
+      get()
     } else {
-      createDay()
+      create()
     }
    
-  }, [])  
+  }, [])
 
-  function createDay() {
+  useEffect(() => {
+    if ( day ) initSort()
+  }, [day])
+
+  function formatAndSetDay(day) {
+    let base = {...day, ...{date: moment(day.date)}}
+    const sorter = (a, b) => {
+      let mealIndex = base.mealOrder.indexOf(a._id)
+      let orderIndex = base.mealOrder.indexOf(b._id)
+      let x = mealIndex < orderIndex ? -1 : 0
+      return x
+    }
+    if (base.meals.length > 0 && base.mealOrder.length > 0) {
+      base.meals = base.meals.sort(sorter)
+    }
+    setDay(base)
+  }
+
+  function create() {
     let date = moment(parseInt(slug))
     API.post('days', {date: date.valueOf()})
     .then(resp => {
@@ -63,14 +83,26 @@ function Day() {
       .catch(console.log)
   }
 
-  function fetchDay() {
+  function get() {
     API.get('days?id=' + slug)
     .then((resp) => {
-      let date = moment(resp.day.date)
-      setDay({...resp.day, ...{date: date}})
-      context.set(date.format('dddd, MMM D'))
+      formatAndSetDay(resp.day)
+      context.set(moment(resp.day.date).format('dddd, MMM D'))
     })
     .catch(console.error)
+  }
+
+  function update(data) {
+    API.patch('days', { id: slug, day: data } )
+    .then((resp) => {
+      if (resp.day) {
+        formatAndSetDay(resp.day)
+      } else {
+        console.error('then err', resp)
+      }
+    }).catch((err) => {
+      console.error('catch err', err)
+    })
   }
 
   function addOrRemoveMeal(event, mealId) {
@@ -85,19 +117,34 @@ function Day() {
         }
       }).catch((err) => {
         console.error('catch err', err)
-      }).finally(() => {
-        console.log('patch request done')
       })
+  }
+
+  function initSort() {
+    if ( sortable ) return;
+    const container = document.getElementById('meal-list')
+    setSortable(
+      Sortable.create(container, {
+        dragClass: 'bg-gray-300',
+        ghostClass: 'bg-green-100',
+        onEnd: function(e) {
+          if ( e.newDraggableIndex !== e.oldDraggableIndex ) {
+            let order = [].slice.call(e.from.children).map(el => parseInt(el.dataset.id))
+            update({mealOrder: order})
+          }
+        }
+      })
+    );
   }
 
   return (
     <>
       <Switch>
         <Route path={path}>
-          <ul>
+          <ul id="meal-list">
             { day && day.meals.length > 0 &&
               day.meals.map((meal, index) => 
-                <li key={meal._id} className={`${bgName(index)} flex items-stretch`}>
+                <li key={meal._id} data-id={meal._id} className={`border-b border-gray-300 flex items-stretch`}>
                   <Link to={`/meals/${meal._id}`} className={`block p-4 flex-grow`}>
                     {meal.name}
                   </Link>
