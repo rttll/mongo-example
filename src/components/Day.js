@@ -5,9 +5,7 @@ import AppContext from '../services/app-context'
 
 import { Switch, Route, Link, useParams, useRouteMatch, useHistory } from "react-router-dom";
 import MealList from './MealList'
-import { motion } from "framer-motion";
-import { Frame, Stack, AnimatePresence, useAnimation } from 'framer'
-import { slideUp } from '../util/motion'
+import Sheet from './Sheet'
 import Sortable from "sortablejs";
 
 function Day() {
@@ -16,60 +14,9 @@ function Day() {
   const { path, url } = useRouteMatch(); 
   const [day, setDay] = useState(null)
   const [meals, setMeals] = useState([])
-  const [isAdding, setIsAdding] = useState(false)
+  const [isSheetActive, setIsSheetActive] = useState(false)
   const [sortable, setSortable] = useState(null)
   const context = useContext(AppContext)
-
-  const controls = useAnimation()
-  const dragThreshold = 50;
-  let initialDragPoint = null;
-  let distanceDragged = 0;
-  let opacity = 1;
-
-  function onDragStart(event, info) {
-    if ( initialDragPoint === null) initialDragPoint = info.point.y
-  }
-
-  function onDrag(event, info) {
-    distanceDragged = info.point.y - initialDragPoint
-    opacity = Math.max(1 - ( distanceDragged / dragThreshold) + .4, 0.3)
-    setOpacity()
-  }
-  
-  function setOpacity() {
-    document.getElementById('header').style.opacity = opacity
-    document.getElementById('items').style.opacity = opacity
-  }
-  
-  function onDrageEnd(event, info) {
-    if ( distanceDragged > dragThreshold || opacity < 0.5 ) {
-      setIsAdding(false)
-    } else {
-      opacity = 1
-      setOpacity()
-      controls.set('visible')
-    }
-  }
-  
-  const body = document.getElementsByTagName('body')[0]
-
-  function dimensions() {
-    return {
-      height: document.documentElement.clientHeight,
-      width:  document.documentElement.clientWidth,
-      initial: document.documentElement.clientHeight,
-    }
-  }
-
-
-  useEffect(() => {
-    if ( isAdding ) {
-      body.style.overflow = 'hidden'
-      controls.start('visible')
-    } else {
-      body.style.overflow = 'auto'
-    }
-  }, [isAdding])
 
   useEffect(() => {
     context.set('Loading...')
@@ -107,7 +54,7 @@ function Day() {
         context.set(date.format('dddd'))
         history.replace(`/days/show/${resp.day._id}`)
       })
-      .catch(console.log)
+    .catch(console.log)
   }
 
   function get() {
@@ -183,74 +130,21 @@ function Day() {
                 )
               }
             </ul>
-            <a href="" className="block p-4" onClick={(e) => {e.preventDefault(); setIsAdding(true)} }>Add</a>
-
+            { day && 
+              <a href="" className="block p-4" onClick={(e) => {e.preventDefault(); setIsSheetActive(true)} }>Add</a>
+            }
           </div>
 
-            {day && isAdding &&
-              <motion.div
-              id="bg"
-              animate={{opacity: 0.3}}
-              initial={{opacity: 0}}
-              exit={{opacity: 0}}
-              transition={{ duration: 0.3, type: "tween" }}
-              onClick={(e) => setIsAdding(false)}
-              className="fixed inset-0 z-30 bg-gray-700"
+          { day && 
+            <Sheet isActive={isSheetActive} setIsActive={setIsSheetActive} title={'Meals'}>
+              <MealList
+                exclude={day.mealIds} 
+                closeSelf={(e) => setIsAdding(false)}
+                onItemClick={ addOrRemoveMeal }
               />
-            }
-
-          
-          <AnimatePresence>
-            {day && isAdding && 
-            
-
-                <Frame
-                  id="drawer"
-                  backgroundColor="transparent"
-                  className="z-30 rounded-t-xl"
-                  height={dimensions().height}
-                  width={dimensions().width}
-                  animate={controls}
-                  initial={{y: dimensions().initial, opacity: 1}}
-                  exit={{y: dimensions().initial, opacity: 1}}
-                  transition={{type: 'tween'}}
-                  variants={{
-                    visible: {y: dimensions().height * 0.3, opacity: 1}
-                  }}                  
-                  // drag={'y'}
-                  dragConstraints={{ top: 0, bottom: 50 }}
-                  dragTransition={{min: 0, max: 10, power: 0.1} }
-                  onDragStart={onDragStart}
-                  onDragEnd={onDrageEnd}
-                  onDrag={onDrag}
-                >
-                  <Stack
-                    gap={0}
-                    width={'100%'}
-                  >
-                    <Frame
-                      id="header"
-                      height={50}
-                      width={'100%'}
-                      className="rounded-t-xl"
-                    >
-                      <div className="relative flex h-full shadow-md">
-                        <div className="z-20 flex items-center justify-between flex-grow bg-white border border-gray-300 rounded-t-xl">
-                          <h1 className="p-4 font-medium">Meals</h1>
-                          <span className="p-4" onClick={() => {setIsAdding(false)}}>&times;</span>
-                        </div>
-                      </div>
-                    </Frame>
-                    <MealList
-                      exclude={day.mealIds} 
-                      closeSelf={(e) => setIsAdding(false)}
-                      onItemClick={ addOrRemoveMeal }
-                    />
-                  </Stack>
-                </Frame>
-            }
-          </AnimatePresence>       
-        
+            </Sheet>
+          }  
+                
         </Route>
       </Switch>  
     </>
