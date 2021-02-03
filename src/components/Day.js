@@ -5,8 +5,8 @@ import AppContext from '../services/app-context'
 
 import { Switch, Route, Link, useParams, useRouteMatch, useHistory } from "react-router-dom";
 import MealList from './MealList'
-import { AnimatePresence, motion } from "framer-motion";
-import { Frame, Stack, Scroll } from 'framer'
+import { motion } from "framer-motion";
+import { Frame, Stack, AnimatePresence, useAnimation } from 'framer'
 import { slideUp } from '../util/motion'
 import Sortable from "sortablejs";
 
@@ -20,8 +20,6 @@ const bgClasses = [
   // 'bg-green-600',
   // 'bg-green-700',
 ]
-
-
 
 function Day() {
   let { action, slug } = useParams();
@@ -39,6 +37,41 @@ function Day() {
     let klass = bgClasses[index]
     return klass
   }
+
+  const controls = useAnimation()
+  const dragThreshold = 50;
+  let initialDragPoint = null;
+  let distanceDragged = 0;
+  let opacity = 1;
+
+  function onDragStart(event, info) {
+    if ( initialDragPoint === null) initialDragPoint = info.point.y
+  }
+
+  function onDrag(event, info) {
+    distanceDragged = info.point.y - initialDragPoint
+    opacity = Math.max(1 - ( distanceDragged / dragThreshold) + .4, 0.3)
+    setOpacity()
+  }
+  
+  function setOpacity() {
+    document.getElementById('header').style.opacity = opacity
+    document.getElementById('items').style.opacity = opacity
+  }
+  
+  function onDrageEnd(event, info) {
+    if ( distanceDragged > dragThreshold || opacity < 0.5 ) {
+      setIsAdding(false)
+    } else {
+      opacity = 1
+      setOpacity()
+      controls.set('visible')
+    }
+  }
+
+  useEffect(() => {
+    if (isAdding) controls.start('visible')
+  }, [isAdding])
 
   const body = document.getElementsByTagName('body')[0]
 
@@ -165,57 +198,70 @@ function Day() {
             <a href="" className="block p-4" onClick={(e) => {e.preventDefault(); setIsAdding(true)} }>Add</a>
 
           </div>
-        
-          {day && isAdding && 
-            <Stack
-              direction='vertical'
-              gap={0}
-              width={'100%'}
-              animate={{y: 0, opacity: 1}}
-              initial={{y: 100, opacity: 0}}
-              className="z-30"
-              >
+
+            {day && isAdding &&
+              <motion.div
+              id="bg"
+              animate={{opacity: 0.3}}
+              initial={{opacity: 0}}
+              exit={{opacity: 0}}
+              transition={{ duration: 0.3, type: "tween" }}
+              onClick={(e) => setIsAdding(false)}
+              className="fixed inset-0 z-30 bg-gray-700"
+              />
+            }
+
+          
+          <AnimatePresence>
+            {day && isAdding && 
             
-              <Frame
-                className="z-30 opacity-30"
-                width={'100%'}
-                backgroundColor="#222"
-                height={100}
-                onClick={(e) => setIsAdding(false)}
-                data-spacer>
-              </Frame>
-              <Frame
-                className="rounded-t-xl"
-                width={'100%'}
-              >
-                <Stack
-                  gap={0}
+
+                <Frame
+                  id="drawer"
+                  backgroundColor="transparent"
+                  className="z-30 rounded-t-xl"
+                  height={'100%'}
                   width={'100%'}
+                  animate={controls}
+                  initial={{y: 200, opacity: 0}}
+                  exit={{y: 200, opacity: 0}}
+                  transition={{type: 'tween'}}
+                  variants={{
+                    visible: {y: 100, opacity: 1}
+                  }}                  
+                  // drag={'y'}
+                  dragConstraints={{ top: 0, bottom: 50 }}
+                  dragTransition={{min: 0, max: 10, power: 0.1} }
+                  onDragStart={onDragStart}
+                  onDragEnd={onDrageEnd}
+                  onDrag={onDrag}
                 >
-                  <Frame
-                    height={50}
+                  <Stack
+                    gap={0}
                     width={'100%'}
-                    backgroundColor="#fff"
-                    className="rounded-t-xl"
                   >
-                    <div className="relative flex h-full shadow-md">
-                      <div className="absolute top-0 z-10 w-full h-4 opacity-30" style={{background: '#222'}}></div>
-                      <div className="z-20 flex items-center justify-between flex-grow bg-white border border-gray-300 rounded-t-xl">
-                        <h1 className="p-4 font-medium">Meals</h1>
-                        <span className="p-4" onClick={() => {setIsAdding(false)}}>&times;</span>
+                    <Frame
+                      id="header"
+                      height={50}
+                      width={'100%'}
+                      className="rounded-t-xl"
+                    >
+                      <div className="relative flex h-full shadow-md">
+                        <div className="z-20 flex items-center justify-between flex-grow bg-white border border-gray-300 rounded-t-xl">
+                          <h1 className="p-4 font-medium">Meals</h1>
+                          <span className="p-4" onClick={() => {setIsAdding(false)}}>&times;</span>
+                        </div>
                       </div>
-                    </div>
-                  </Frame>
-                    <MealList 
+                    </Frame>
+                    <MealList
                       exclude={day.mealIds} 
                       closeSelf={(e) => setIsAdding(false)}
                       onItemClick={ addOrRemoveMeal }
-                      className="bg-white"
                     />
-                </Stack>
-              </Frame>
-            </Stack>
-          }
+                  </Stack>
+                </Frame>
+            }
+          </AnimatePresence>       
         
         </Route>
       </Switch>  
