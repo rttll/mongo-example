@@ -1,13 +1,37 @@
 import { Frame, Scroll } from 'framer'
+import { useState } from 'react';
+import Sortable from "sortablejs";
 
 function List(props) {
-
+  const [sortable, setSortable] = useState(null)
+  
   function doItemClick(e, item) {
-    props.onItemClick(e, item).then(cb => {
-      if ( typeof cb === 'function') cb()
-    })
+    const action = props.onItemClick(e, item)
+    if (typeof action === 'object' && typeof action.then === 'function') {
+      action.then(cb => {
+        if ( typeof cb === 'function') cb()
+      })
+
+    }
   }
 
+  function initSort() {
+    if ( sortable ) return;
+    const container = document.getElementById('meal-list')
+    setSortable(
+      Sortable.create(container, {
+        dragClass: 'bg-gray-300',
+        ghostClass: 'bg-green-100',
+        onEnd: function(e) {
+          if ( e.newDraggableIndex !== e.oldDraggableIndex ) {
+            let order = [].slice.call(e.from.children).map(el => parseInt(el.dataset.id))
+            update({mealOrder: order})
+          }
+        }
+      })
+    );
+  }
+  
   return (
     <Scroll
       data-list
@@ -19,7 +43,7 @@ function List(props) {
         <Frame
           height={50}
           width="100%"
-          key={item.key}
+          key={item.key || item._id}
           backgroundColor="transparent"
           className="border-b border-gray-300"
         >
@@ -32,7 +56,7 @@ function List(props) {
         </Frame>
       )}
       
-      <Frame height={200} data-spacer backgroundColor="transparent"></Frame>
+      {/* <Frame height={200} data-spacer backgroundColor="transparent"></Frame> */}
 
     </Scroll>
 

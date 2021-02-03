@@ -31,8 +31,7 @@ function App() {
         <div className="flex flex-col items-center w-screen bg-white">
           <AppHeader />
           <div
-            style={{minHeight: '400px'}}
-            className="relative w-full"
+            className="relative w-full h-full"
           >
             <Switch>
               <Route exact path="/">
