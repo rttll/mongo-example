@@ -10,17 +10,6 @@ import { Frame, Stack, AnimatePresence, useAnimation } from 'framer'
 import { slideUp } from '../util/motion'
 import Sortable from "sortablejs";
 
-// Classnames need to be stored explicity, or PurgeCSS will not include them.
-const bgClasses = [
-  'bg-green-100',
-  'bg-green-200',
-  'bg-green-300',
-  'bg-green-400',
-  'bg-green-500',
-  // 'bg-green-600',
-  // 'bg-green-700',
-]
-
 function Day() {
   let { action, slug } = useParams();
   const history = useHistory()
@@ -30,13 +19,6 @@ function Day() {
   const [isAdding, setIsAdding] = useState(false)
   const [sortable, setSortable] = useState(null)
   const context = useContext(AppContext)
-
-  const bgName = (index) => {
-    let max = bgClasses.length - 1
-    if (index > max) index = max
-    let klass = bgClasses[index]
-    return klass
-  }
 
   const controls = useAnimation()
   const dragThreshold = 50;
@@ -68,16 +50,22 @@ function Day() {
       controls.set('visible')
     }
   }
-
-  useEffect(() => {
-    if (isAdding) controls.start('visible')
-  }, [isAdding])
-
+  
   const body = document.getElementsByTagName('body')[0]
+
+  function dimensions() {
+    return {
+      height: document.documentElement.clientHeight,
+      width:  document.documentElement.clientWidth,
+      initial: document.documentElement.clientHeight,
+    }
+  }
+
 
   useEffect(() => {
     if ( isAdding ) {
       body.style.overflow = 'hidden'
+      controls.start('visible')
     } else {
       body.style.overflow = 'auto'
     }
@@ -220,14 +208,14 @@ function Day() {
                   id="drawer"
                   backgroundColor="transparent"
                   className="z-30 rounded-t-xl"
-                  height={'100%'}
-                  width={'100%'}
+                  height={dimensions().height}
+                  width={dimensions().width}
                   animate={controls}
-                  initial={{y: 200, opacity: 0}}
-                  exit={{y: 200, opacity: 0}}
+                  initial={{y: dimensions().initial, opacity: 1}}
+                  exit={{y: dimensions().initial, opacity: 1}}
                   transition={{type: 'tween'}}
                   variants={{
-                    visible: {y: 100, opacity: 1}
+                    visible: {y: dimensions().height * 0.3, opacity: 1}
                   }}                  
                   // drag={'y'}
                   dragConstraints={{ top: 0, bottom: 50 }}
