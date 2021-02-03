@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useContext } from "react";
+import { useEffect, useState, useContext } from "react";
 import moment from 'moment'
 import { Switch, Route, useParams, useRouteMatch, useHistory } from "react-router-dom";
 import { Stack, Frame } from 'framer'
@@ -119,7 +119,6 @@ function Day() {
             <>
               <Stack width={window.innerWidth}>
                 <List
-                  data-list
                   items={day.meals}
                   onItemClick={ goToMeal }
                 />
@@ -130,8 +129,8 @@ function Day() {
             
               <Sheet isActive={isSheetActive} setIsActive={setIsSheetActive} title={'Meals'}>
                 <List
-                  data-list
                   items={meals}
+                  spacer={true}
                   onItemClick={ addOrRemoveMeal }
                 />
               </Sheet>

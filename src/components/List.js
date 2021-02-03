@@ -38,25 +38,28 @@ function List(props) {
       backgroundColor="white"
       height={'100%'}
       width="100%"
+      className=""
     >
       {props.items.map((item, i) => 
+
         <Frame
           height={50}
           width="100%"
           key={item.key || item._id}
           backgroundColor="transparent"
-          className="border-b border-gray-300"
-        >
-          <span 
-            onClick={ (e) => doItemClick(e, item) } 
-            className={`flex justify-between p-4 cursor-pointer bg-white hover:bg-gray-100 ${item.inactive ? 'line-through text-gray-300' : ''} `}
+          className="border-b border-gray-200"
+          onClick={ (e) => doItemClick(e, item) } 
           >
-            {item.name}
-          </span>
+          <div className="flex items-center h-full">
+            <span className="px-4 text-sm text-gray-700">{item.name}</span>
+          </div>
         </Frame>
+          
       )}
       
-      {/* <Frame height={200} data-spacer backgroundColor="transparent"></Frame> */}
+      {props.spacer && 
+        <Frame height={200} data-spacer backgroundColor="transparent"></Frame>
+      }
 
     </Scroll>
 

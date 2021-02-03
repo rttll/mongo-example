@@ -1,7 +1,6 @@
-import React, { useEffect, useState, useContext } from "react";
+import { useEffect } from "react";
 import { motion } from "framer-motion";
 import { Frame, Stack, AnimatePresence, useAnimation } from 'framer'
-import { slideUp } from '../util/motion'
 
 function Sheet(props) { 
   const controls = useAnimation()
@@ -65,14 +64,14 @@ function Sheet(props) {
             data-sheet
             backgroundColor="#fff"
             className="z-30 rounded-t-xl"
-            height={document.documentElement.clientHeight * 0.7}
+            height={400}
             width={document.documentElement.clientWidth}
             animate={controls}
-            initial={{y: document.documentElement.clientHeight, opacity: 1}}
-            exit={{y: document.documentElement.clientHeight, opacity: 1}}
+            initial={{y: document.documentElement.clientHeight}}
+            exit={{y: document.documentElement.clientHeight}}
             transition={{type: 'tween'}}
             variants={{
-              visible: {y: (document.documentElement.clientHeight - document.documentElement.clientHeight * 0.7), opacity: 1}
+              visible: {y: (document.documentElement.clientHeight - 400)}
             }}                  
             // drag={'y'}
             dragConstraints={{ top: 0, bottom: 50 }}
@@ -84,19 +83,23 @@ function Sheet(props) {
             <Stack
               gap={0}
               width={document.documentElement.clientWidth}
-              height={document.documentElement.clientHeight * 0.7}
-            >
+              height={'100%'}
+              className="border border-gray-300 rounded-t-xl"
+              >
               <Frame
                 id="header"
                 height={50}
-                width={'100%'}
+                width={document.documentElement.clientWidth}
                 className="rounded-t-xl"
+                backgroundColor="transparent"
               >
-                <div className="relative flex h-full shadow-md">
-                  <div className="z-20 flex items-center justify-between flex-grow bg-white border border-gray-300 rounded-t-xl">
-                    <h1 className="p-4 font-medium">{props.title || 'You need a title'}</h1>
-                    <span className="p-4" onClick={() => {props.setIsActive(false)}}>&times;</span>
-                  </div>
+                <div className="relative flex items-center justify-between h-full shadow-md" >
+                  <h1 className="max-h-full p-4 font-medium leading-none text-gray-700">
+                    {props.title || 'You need a title'}</h1>
+                  <span 
+                    className="max-h-full p-4 leading-none" 
+                    onClick={() => {props.setIsActive(false)}}>&times;</span>
+                  <i style={{height: '8px'}} className="absolute bottom-0 left-0 z-20 w-full border-b border-gray-200 shadow-md opacity-60"></i>
                 </div>
               </Frame>
               
