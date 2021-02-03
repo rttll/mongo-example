@@ -4,19 +4,21 @@ import API from '../services/api'
 import AppContext from '../services/app-context'
 
 import { Switch, Route, Link, useParams, useRouteMatch, useHistory } from "react-router-dom";
-import MealList from './MealList'
+import List from './List'
 import Sheet from './Sheet'
 import Sortable from "sortablejs";
 
 function Day() {
   let { action, slug } = useParams();
-  const history = useHistory()
   const { path, url } = useRouteMatch(); 
-  const [day, setDay] = useState(null)
-  const [meals, setMeals] = useState([])
-  const [isSheetActive, setIsSheetActive] = useState(false)
-  const [sortable, setSortable] = useState(null)
+  const history = useHistory()
   const context = useContext(AppContext)
+  
+  const [day, setDay] = useState(null)
+  const [sortable, setSortable] = useState(null)
+  
+  const [isSheetActive, setIsSheetActive] = useState(false)
+  const [meals, setMeals] = useState([])
 
   useEffect(() => {
     context.set('Loading...')
@@ -31,6 +33,17 @@ function Day() {
   useEffect(() => {
     if ( day ) initSort()
   }, [day])
+
+  useEffect(() => {
+    API.get('meals')
+      .then((resp) => {
+        setMeals(resp.meals.map((m) => {
+          let inactive = day.mealIds.indexOf(m._id) > -1
+          return {...m, ...{key: m._id, inactive: inactive}}
+        }))
+      })
+      .catch((err) => console.log)
+  }, [isSheetActive])  
 
   function formatAndSetDay(day) {
     let base = {...day, ...{date: moment(day.date)}}
@@ -79,13 +92,17 @@ function Day() {
     })
   }
 
-  function addOrRemoveMeal(event, mealId) {
-    event.preventDefault()
+  function addOrRemoveMeal(event, meal) {
+    let mealId = meal._id
     const mealIds = day.mealIds.indexOf(mealId) === -1 ? day.mealIds.concat([mealId]) : day.mealIds.filter(id => id !== mealId)
-    API.patch('days', { id: slug, day: {mealIds: mealIds } } )
+    return API.patch('days', { id: slug, day: {mealIds: mealIds } } )
       .then((resp) => {
         if (resp.day) {
           setDay({...resp.day, ...{date: moment(resp.day.date)}})
+          return () => {
+            event.target.classList.add('line-through')
+            event.target.classList.add('text-gray-300')
+          }
         } else {
           console.error('then err', resp)
         }
@@ -123,7 +140,7 @@ function Day() {
                     <Link to={`/meals/${meal._id}`} className={`block p-4 flex-grow`}>
                       {meal.name}
                     </Link>
-                    <a href="#" onClick={ (event) => addOrRemoveMeal(event, meal._id) } className="flex items-center px-4 ">
+                    <a href="#" onClick={ (event) => addOrRemoveMeal(event, meal) } className="flex items-center px-4 ">
                       <span>&times;</span>
                     </a>
                   </li>
@@ -137,9 +154,10 @@ function Day() {
 
           { day && 
             <Sheet isActive={isSheetActive} setIsActive={setIsSheetActive} title={'Meals'}>
-              <MealList
-                exclude={day.mealIds} 
-                closeSelf={(e) => setIsAdding(false)}
+              <List
+                data-list
+                items={meals}
+                // closeSelf={(e) => setIsAdding(false)}
                 onItemClick={ addOrRemoveMeal }
               />
             </Sheet>

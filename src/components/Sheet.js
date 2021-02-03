@@ -62,17 +62,17 @@ function Sheet(props) {
       <AnimatePresence>
         {props.isActive &&
           <Frame
-            id="drawer"
-            backgroundColor="transparent"
+            data-sheet
+            backgroundColor="#fff"
             className="z-30 rounded-t-xl"
-            height={document.documentElement.clientHeight}
+            height={document.documentElement.clientHeight * 0.7}
             width={document.documentElement.clientWidth}
             animate={controls}
             initial={{y: document.documentElement.clientHeight, opacity: 1}}
             exit={{y: document.documentElement.clientHeight, opacity: 1}}
             transition={{type: 'tween'}}
             variants={{
-              visible: {y: document.documentElement.clientHeight * 0.3, opacity: 1}
+              visible: {y: (document.documentElement.clientHeight - document.documentElement.clientHeight * 0.7), opacity: 1}
             }}                  
             // drag={'y'}
             dragConstraints={{ top: 0, bottom: 50 }}
@@ -83,7 +83,8 @@ function Sheet(props) {
           >
             <Stack
               gap={0}
-              width={'100%'}
+              width={document.documentElement.clientWidth}
+              height={document.documentElement.clientHeight * 0.7}
             >
               <Frame
                 id="header"
