@@ -22,13 +22,12 @@ function List(props) {
     );    
   }, [props.showActions])  
 
-  function doItemClick(e, item) {
-    const action = props.onItemClick(e, item)
+  function clicked(e, item) {
+    const action = props.onItemClicked(e, item)
     if (typeof action === 'object' && typeof action.then === 'function') {
       action.then(cb => {
         if ( typeof cb === 'function') cb()
       })
-
     }
   }
   
@@ -43,19 +42,20 @@ function List(props) {
         >
           <div className="flex items-stretch justify-between h-full">
             <span
-              onClick={ (e) => doItemClick(e, item) } 
+              onClick={ (e) => clicked(e, item) } 
               className="flex flex-grow p-4 text-sm text-gray-700 items-left"
-            >
-              <span className="my-auto">{item.name} {item._id} </span>
+              >
+              <span className="my-auto">{item.name}</span>
             </span>
             {props.showActions && 
               <div className="flex items-center h-full">
                 <span
                   className="flex h-full px-6 py-4 text-sm text-gray-700 bg-yellow-400 cursor-move list-sort-handle"
-                >
+                  >
                   <span className="m-auto">=</span>
                 </span>
                 <span
+                  onClick={ (e) => props.deleteIconClicked && props.deleteIconClicked(e, item) } 
                   className="flex h-full px-6 py-4 text-sm text-gray-700 bg-red-400"
                 >
                   <span className="m-auto">&times;</span>

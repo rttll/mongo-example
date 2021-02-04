@@ -109,6 +109,7 @@ function Day() {
   }
 
   function goToMeal(event, meal) {
+    if ( isEditting ) return;
     event.preventDefault()
     history.push(`/meals/${meal._id}`)
   }
@@ -123,10 +124,12 @@ function Day() {
                 className=""
                 items={day.meals}
                 sortKey={'_id'}
-                onItemClick={ goToMeal }
+                onItemClicked={ goToMeal }
+                deleteIconClicked={addOrRemoveMeal}
                 onSortEnd={ onSortEnd }
                 showActions={isEditting}
-                />
+              />
+              
               <span className="block p-4" onClick={ () => {setIsSheetActive(true)} }>add</span>
               <span className="block p-4" onClick={ () => {setIsEdditing(!isEditting)} }>edit</span>
 
@@ -135,7 +138,7 @@ function Day() {
                   <List
                     items={meals}
                     spacer={true}
-                    onItemClick={addOrRemoveMeal}
+                    onItemClicked={ addOrRemoveMeal }
                     showActions={false}
                     />
                 </Scroll>
