@@ -115,29 +115,29 @@ function Home() {
   return (
     <>
       {grid.map((month, i) =>
-        <div key={month.name} className="flex flex-col h-screen">
+        <div key={month.name} className="flex flex-col" style={{height: window.innerHeight - document.getElementById('app-header').clientHeight}}>
           <header className="sticky z-10 pt-1 pb-2 bg-white" style={{top: '40px'}}>
-            <h1 className="px-1 py-1 text-xs text-gray-600 uppercase bg-white">{month.name}</h1>
+            <h1 className="px-1 py-1 text-gray-700 uppercase bg-white">{month.name}</h1>
             <div className="grid flex-grow grid-cols-7">
               {dayNames.map((name) => 
                 <div key={name} className="flex-shrink pl-1 text-xs text-gray-500">{name}</div>
               )}
             </div>
           </header>
-          <div className="grid flex-grow grid-cols-7">
+          <div className="grid flex-1 grid-cols-7 bg-gray-100">
             {month.dates.map((obj) =>
               <Link 
                 to={obj.href}
                 key={obj.id} 
                 id={ obj.isToday ? 'today' : ''}
-                className={`${obj.isToday ? 'bg-yellow-100' : ''} relative py-4 border-b border-r border-gray-200 hover:bg-blue-50`}
+                className={`${obj.isToday ? 'bg-yellow-100' : ''} ${obj.filler ? 'opacity-0' : 'bg-white'} flex-col items-center relative flex justify-center border-b border-r border-gray-200 hover:bg-blue-50`}
               >
-                <span className="absolute top-0 left-0 p-1 text-xs text-gray-500">
-                  { obj.date } 
-                </span>
-                <div className="flex p-1 space-x-1">
+                <p className="font-medium text-gray-700">
+                  {obj.date}
+                </p>
+                <div className="flex p-1 space-x-1 overflow-hidden whitespace-nowrap">
                   {obj.mealIds.map(int => 
-                    <i key={int} className="w-1 h-1 bg-green-200 rounded-full"></i>
+                    <i key={int} className="w-1 h-1 bg-yellow-500 rounded-full"></i>
                   )}
                 </div>
               </Link>
