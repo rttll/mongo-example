@@ -1,7 +1,8 @@
 import { useEffect, useState, useContext } from "react";
 import moment from 'moment'
+import { debounce } from 'lodash'
 import { Switch, Route, useParams, useRouteMatch, useHistory } from "react-router-dom";
-import { Stack, Frame } from 'framer'
+import { Stack, Frame, Scroll } from 'framer'
 import API from '../services/api'
 import AppContext from '../services/app-context'
 
@@ -15,7 +16,7 @@ function Day() {
   const context = useContext(AppContext)
   
   const [day, setDay] = useState(null)
-  
+  const [isEditting, setIsEdditing] = useState(false)
   const [isSheetActive, setIsSheetActive] = useState(false)
   const [meals, setMeals] = useState([])
 
@@ -73,17 +74,18 @@ function Day() {
     .catch(console.error)
   }
 
-  function update(data) {
-    API.patch('days', { id: slug, day: data } )
-    .then((resp) => {
-      if (resp.day) {
-        formatAndSetDay(resp.day)
-      } else {
-        console.error('then err', resp)
-      }
-    }).catch((err) => {
-      console.error('catch err', err)
-    })
+  let sortTimer = null;
+  function onSortEnd(order) {
+    if ( sortTimer !== null ) clearTimeout(sortTimer)
+    const startTimer = (order) => {
+      sortTimer = setTimeout(saveSort, 250, order)
+    }
+    startTimer(order)
+  }
+
+  function saveSort(order) {
+    API.patch('days', { id: slug, day: {mealOrder: order}} )
+      .catch((err) => {console.error(err)})
   }
 
   function addOrRemoveMeal(event, meal) {
@@ -117,21 +119,23 @@ function Day() {
         <Route path={path}>
           {day && 
             <>
-              <Stack width={window.innerWidth}>
-                <List
-                  items={day.meals}
-                  onItemClick={ goToMeal }
+              <List
+                className=""
+                items={day.meals}
+                sortKey={'_id'}
+                onItemClick={ goToMeal }
+                onSortEnd={ onSortEnd }
+                showActions={isEditting}
                 />
-                <Frame width={window.innerWidth} height={50} backgroundColor="transparent">
-                  <a href="" className="block p-4" onClick={(e) => {e.preventDefault(); setIsSheetActive(true)} }>Add</a>
-                </Frame>
-              </Stack>
-            
+              <span className="block p-4" onClick={ () => {setIsSheetActive(true)} }>add</span>
+              <span className="block p-4" onClick={ () => {setIsEdditing(!isEditting)} }>edit</span>
+
               <Sheet isActive={isSheetActive} setIsActive={setIsSheetActive} title={'Meals'}>
                 <List
                   items={meals}
                   spacer={true}
-                  onItemClick={ addOrRemoveMeal }
+                  onItemClick={addOrRemoveMeal}
+                  showActions={false}
                 />
               </Sheet>
             </>

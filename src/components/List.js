@@ -1,10 +1,27 @@
-import { Frame, Scroll } from 'framer'
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import Sortable from "sortablejs";
 
 function List(props) {
   const [sortable, setSortable] = useState(null)
   
+  useEffect(() => {
+    if ( sortable ) return;
+    const container = document.querySelector('[data-list]')
+    setSortable(
+      Sortable.create(container, {
+        dragClass: 'bg-gray-300',
+        ghostClass: 'bg-green-100',
+        handle: '.list-sort-handle',
+        onEnd: function(e) {
+          if ( e.newDraggableIndex !== e.oldDraggableIndex ) {
+            const order = [].slice.call(e.from.children).map(el => parseInt(el.dataset.sortKey))
+            props.onSortEnd(order)
+          }
+        }
+      })
+    );    
+  }, [props.showActions])  
+
   function doItemClick(e, item) {
     const action = props.onItemClick(e, item)
     if (typeof action === 'object' && typeof action.then === 'function') {
@@ -14,54 +31,49 @@ function List(props) {
 
     }
   }
-
-  function initSort() {
-    if ( sortable ) return;
-    const container = document.getElementById('meal-list')
-    setSortable(
-      Sortable.create(container, {
-        dragClass: 'bg-gray-300',
-        ghostClass: 'bg-green-100',
-        onEnd: function(e) {
-          if ( e.newDraggableIndex !== e.oldDraggableIndex ) {
-            let order = [].slice.call(e.from.children).map(el => parseInt(el.dataset.id))
-            update({mealOrder: order})
-          }
-        }
-      })
-    );
-  }
   
   return (
-    <Scroll
-      data-list
-      backgroundColor="white"
-      height={'100%'}
-      width="100%"
-      className=""
-    >
+    <div data-list>
       {props.items.map((item, i) => 
-
-        <Frame
-          height={50}
+        <div
           width="100%"
           key={item.key || item._id}
-          backgroundColor="transparent"
-          className="border-b border-gray-200"
-          onClick={ (e) => doItemClick(e, item) } 
-          >
-          <div className="flex items-center h-full">
-            <span className="px-4 text-sm text-gray-700">{item.name}</span>
+          data-sort-key={item[props.sortKey]}
+          className="w-full border-b border-gray-200"
+        >
+          <div className="flex items-stretch justify-between h-full">
+            <span
+              onClick={ (e) => doItemClick(e, item) } 
+              className="flex flex-grow p-4 text-sm text-gray-700 items-left"
+            >
+              <span className="my-auto">{item.name} {item._id} </span>
+            </span>
+            {props.showActions && 
+              <div className="flex items-center h-full">
+                <span
+                  className="flex h-full px-6 py-4 text-sm text-gray-700 bg-yellow-400 cursor-move list-sort-handle"
+                >
+                  <span className="m-auto">=</span>
+                </span>
+                <span
+                  className="flex h-full px-6 py-4 text-sm text-gray-700 bg-red-400"
+                >
+                  <span className="m-auto">&times;</span>
+                </span>
+
+              </div>
+            }
+            
           </div>
-        </Frame>
+        </div>
           
       )}
       
       {props.spacer && 
-        <Frame height={200} data-spacer backgroundColor="transparent"></Frame>
+        <div style={{height: '200px'}} data-spacer></div>
       }
 
-    </Scroll>
+    </div>
 
   )
 }
