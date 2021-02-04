@@ -33,6 +33,7 @@ const methods = {
       _id: id,
       date: req.body.date,
       mealIds: [],
+      mealOrder: [],
     })
     // todo remove second request here
     let resp = await getOneDay(id)
