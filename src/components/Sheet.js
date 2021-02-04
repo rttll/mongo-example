@@ -7,7 +7,6 @@ function Sheet(props) {
   const dragThreshold = 50;
   let initialDragPoint = null;
   let distanceDragged = 0;
-  let opacity = 1;
   
   useEffect(() => {
     if ( props.isActive ) {
@@ -24,21 +23,12 @@ function Sheet(props) {
   
   function onDrag(event, info) {
     distanceDragged = info.point.y - initialDragPoint
-    opacity = Math.max(1 - ( distanceDragged / dragThreshold) + .4, 0.3)
-    setOpacity()
-  }
-  
-  function setOpacity() {
-    document.getElementById('header').style.opacity = opacity
-    document.getElementById('items').style.opacity = opacity
   }
   
   function onDrageEnd(event, info) {
-    if ( distanceDragged > dragThreshold || opacity < 0.5 ) {
+    if ( distanceDragged > dragThreshold ) {
       props.setIsActive(false)
     } else {
-      opacity = 1
-      setOpacity()
       controls.set('visible')
     }
   }
@@ -66,14 +56,15 @@ function Sheet(props) {
             className="z-30 rounded-t-xl"
             height={400}
             width={document.documentElement.clientWidth}
+            style={{top: window.innerHeight - 400}}
             animate={controls}
-            initial={{y: document.documentElement.clientHeight}}
+            initial={{y: 400}}
             exit={{y: document.documentElement.clientHeight}}
             transition={{type: 'tween'}}
             variants={{
-              visible: {y: (document.documentElement.clientHeight - 400)}
+              visible: {y: 0}
             }}                  
-            // drag={'y'}
+            drag={'y'}
             dragConstraints={{ top: 0, bottom: 50 }}
             dragTransition={{min: 0, max: 10, power: 0.1} }
             onDragStart={onDragStart}

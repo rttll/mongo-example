@@ -131,12 +131,14 @@ function Day() {
               <span className="block p-4" onClick={ () => {setIsEdditing(!isEditting)} }>edit</span>
 
               <Sheet isActive={isSheetActive} setIsActive={setIsSheetActive} title={'Meals'}>
-                <List
-                  items={meals}
-                  spacer={true}
-                  onItemClick={addOrRemoveMeal}
-                  showActions={false}
-                />
+                <Scroll height='100%' width='100%'>
+                  <List
+                    items={meals}
+                    spacer={true}
+                    onItemClick={addOrRemoveMeal}
+                    showActions={false}
+                    />
+                </Scroll>
               </Sheet>
             </>
           }      
