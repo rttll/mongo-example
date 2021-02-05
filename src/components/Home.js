@@ -16,11 +16,11 @@ function Home() {
   const history = useHistory()
   const [days, setDays] = useState([])
   const [grid, setGrid] = useState([])
-  const context = useContext(AppContext)
+  const appHeader = useContext(AppContext)
   const dayNames = times(7, i => moment().startOf('week').add(i+1, 'days').format('ddd') )
   
   useEffect(() => {
-    context.set() // Sets header text to default 
+    appHeader.setTitle() // Sets header text to default 
     API.get('days')
       .then((resp) => { 
         if ( resp.status === 401 ) history.push('/login')

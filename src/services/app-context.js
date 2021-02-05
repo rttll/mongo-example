@@ -11,6 +11,7 @@ const defaultText = 'Meal Planner'
 
 export default React.createContext({
   text: defaultText,
-  foo: '',
-  set: () => {}
+  user: {},
+  setTitle: () => {},
+  setUser: () => {}
 })

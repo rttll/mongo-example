@@ -17,13 +17,25 @@ import './App.css';
 function App() {
   const defaultText = 'Meal Planner'
   const [headerText, setHeaderText] = useState(defaultText)
+  const [user, setUser] = useState(null)
   
   const defaultHeader = {
     text: headerText,
-    set: (text = defaultText) => {
+    setTitle: (text = defaultText) => {
       setHeaderText(text)
+    },
+    user: user,
+    setUser: (user) => {
+      localStorage.setItem('meal-planner-user', JSON.stringify(user))
+      setUser(user)
     }
   }
+
+  useEffect(() => {
+    let user = localStorage.getItem('meal-planner-user')
+    if (user === null) return;
+    setUser(JSON.parse(user))
+  }, [])
 
   return (
     <AppContext.Provider value={defaultHeader}>

@@ -12,7 +12,7 @@ function Day() {
   let { action, slug } = useParams();
   const { path, url } = useRouteMatch(); 
   const history = useHistory()
-  const context = useContext(AppContext)
+  const appHeader = useContext(AppContext)
   
   const [day, setDay] = useState(null)
   const [isEditting, setIsEdditing] = useState(false)
@@ -20,7 +20,7 @@ function Day() {
   const [meals, setMeals] = useState([])
   
   useEffect(() => {    
-    context.set('Loading...')
+    appHeader.setTitle('Loading...')
     if ( action === 'show' ) {
       get()
     } else {
@@ -61,7 +61,7 @@ function Day() {
       .then(resp => {
         if ( resp.status === 401 ) history.push('/login')
         setDay({...resp.day, ...{date: date}})
-        context.set(date.format('dddd'))
+        appHeader.setTitle(date.format('dddd'))
         history.replace(`/days/show/${resp.day._id}`)
       })
     .catch(console.log)
@@ -72,7 +72,7 @@ function Day() {
     .then((resp) => {
       if ( resp.status === 401 ) history.push('/login')
       formatAndSetDay(resp.day)
-      context.set(moment(resp.day.date).format('dddd, MMM D'))
+      appHeader.setTitle(moment(resp.day.date).format('dddd, MMM D'))
     })
     .catch(console.error)
   }

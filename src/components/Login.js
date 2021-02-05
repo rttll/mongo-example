@@ -4,17 +4,22 @@ import AppContext from '../services/app-context'
 
 
 function Login() {
-  const context = useContext(AppContext)
+  const appHeader = useContext(AppContext)
   
   useEffect(() => {
-    context.set('Login')
+    appHeader.setTitle('Login')
   }, [])
   
   function login() {
     API.post('login')
       .then((resp) => {
-        // todo save username
-        console.log(resp)
+        if (resp.status === 200) {
+          delete resp.status
+          appHeader.setUser(resp)
+        } else {
+          console.error(resp)
+        }
+
       })
       .catch(console.error)
   }

@@ -19,7 +19,10 @@ module.exports = async (req, res) => {
   if ( user ) {
     let token = signToken(user)
     setCookies(token, req, res)
-    res.status(200).json({token})
+    
+    let { id, name, email } = user
+    res.status(200).json({id, name, email})
+    
   } else {
     console.log('errr user noooo')
   }

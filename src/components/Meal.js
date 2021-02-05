@@ -9,7 +9,7 @@ function Meal() {
   let params = useParams();
   let location = useLocation()
   const history = useHistory()
-  const context = useContext(AppContext)
+  const appHeader = useContext(AppContext)
   const [deleteConfirmation, setDeleteConfirmation] = useState(0)
   const [meal, setMeal] = useState({name: '', link: '', notes: ''})
   const [mealName, setMealName] = useState('')
@@ -20,13 +20,13 @@ function Meal() {
   const loading = useRef(true)
 
   useEffect(() => {
-    context.set('Loading...')
+    appHeader.setTitle('Loading...')
     API.get('meals?id=' + params.id)
       .then((resp) => {
         if ( resp.status === 401 ) history.push('/login')
         if (resp.meal) {
           setMeal(resp.meal)
-          context.set(resp.meal.name)
+          appHeader.setTitle(resp.meal.name)
           if ( loading.current ) {
             loading.current = false
           } else {

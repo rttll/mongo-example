@@ -2,11 +2,10 @@ import { useContext} from 'react'
 import { useHistory, useLocation, Link } from "react-router-dom";
 import AppContext from '../services/app-context'
 
-
 function AppHeader() {
   const history = useHistory()
   const location = useLocation()
-  const context = useContext(AppContext)
+  const appHeader = useContext(AppContext)
   
   function back(e) {
     e.preventDefault(); 
@@ -22,14 +21,19 @@ function AppHeader() {
             <a href="#" onClick={ back } className="absolute left-0 block px-4 py-4 pr-8 text-xs leading-none text-white">&larr;</a>
           }
           <h1 className="py-4 text-xs font-medium leading-none text-center text-white">
-            <span>{ context.text }</span>
+            <span>{ appHeader.text }</span>
           </h1>
-          <Link
-            to="/login"
-            className="absolute top-0 right-0 z-10 block px-4 py-4 pl-8 text-xs leading-none text-white"
-          >
-            Login
-          </Link>
+          {appHeader.user === null &&
+            <Link
+              to="/login"
+              className="absolute top-0 right-0 z-10 block px-4 py-4 pl-8 text-xs leading-none text-white"
+            >
+              Login
+            </Link>
+          }
+          {appHeader.user && 
+            <span className="absolute top-0 right-0 z-10 block px-4 py-4 pl-8 text-xs leading-none text-white">o</span>
+          }
         </div>
       </div>
     </header>
