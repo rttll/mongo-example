@@ -1,6 +1,8 @@
+
 const log = console.log
 
 const dispatch = (method, url, data = {}) => {  
+
   let config = { 
     method: method,
     headers: {
@@ -16,8 +18,10 @@ const dispatch = (method, url, data = {}) => {
   
   try {
     return fetch(urlWithMethod, config)
-      .then((resp) => resp.json())
-      .then((json) => json)
+      .then( async (resp) => {
+        let json = await resp.json()
+        return {...json, ...{status: resp.status}}
+      })
       .catch((err) => {
         return { error: err}
       })

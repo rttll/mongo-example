@@ -1,8 +1,7 @@
 import { useEffect, useState, useContext } from "react";
 import moment from 'moment'
-import { debounce } from 'lodash'
 import { Switch, Route, useParams, useRouteMatch, useHistory } from "react-router-dom";
-import { Stack, Frame, Scroll } from 'framer'
+import { Scroll } from 'framer'
 import API from '../services/api'
 import AppContext from '../services/app-context'
 
@@ -19,8 +18,8 @@ function Day() {
   const [isEditting, setIsEdditing] = useState(false)
   const [isSheetActive, setIsSheetActive] = useState(false)
   const [meals, setMeals] = useState([])
-
-  useEffect(() => {
+  
+  useEffect(() => {    
     context.set('Loading...')
     if ( action === 'show' ) {
       get()
@@ -30,8 +29,10 @@ function Day() {
   }, [])
 
   useEffect(() => {
+    if ( !isSheetActive ) return;
     API.get('meals')
       .then((resp) => {
+        if ( resp.status === 401 ) history.push('/login')
         setMeals(resp.meals.map((m) => {
           let inactive = day.mealIds.indexOf(m._id) > -1
           return {...m, ...{key: m._id, inactive: inactive}}
@@ -57,7 +58,8 @@ function Day() {
   function create() {
     let date = moment(parseInt(slug))
     API.post('days', {date: date.valueOf()})
-    .then(resp => {
+      .then(resp => {
+        if ( resp.status === 401 ) history.push('/login')
         setDay({...resp.day, ...{date: date}})
         context.set(date.format('dddd'))
         history.replace(`/days/show/${resp.day._id}`)
@@ -68,6 +70,7 @@ function Day() {
   function get() {
     API.get('days?id=' + slug)
     .then((resp) => {
+      if ( resp.status === 401 ) history.push('/login')
       formatAndSetDay(resp.day)
       context.set(moment(resp.day.date).format('dddd, MMM D'))
     })
@@ -85,6 +88,9 @@ function Day() {
 
   function saveSort(order) {
     API.patch('days', { id: slug, day: {mealOrder: order}} )
+      .then((resp) => {
+        if ( resp.status === 401 ) history.push('/login')
+      })
       .catch((err) => {console.error(err)})
   }
 

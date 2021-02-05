@@ -10,6 +10,7 @@ function Meals() {
   useEffect(() => {
     API.get('meals')
       .then((resp) => {
+        if ( resp.status === 401 ) history.push('/login')
         // console.log(resp)
         setMeals(resp.meals)
       })

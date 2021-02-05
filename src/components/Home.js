@@ -8,11 +8,12 @@ import { list } from '../util/motion'
 
 import {
   Link,
+  useHistory,
   useRouteMatch
 } from "react-router-dom";
 
 function Home() {
-  window.moment = moment
+  const history = useHistory()
   const [days, setDays] = useState([])
   const [grid, setGrid] = useState([])
   const context = useContext(AppContext)
@@ -22,6 +23,7 @@ function Home() {
     context.set() // Sets header text to default 
     API.get('days')
       .then((resp) => { 
+        if ( resp.status === 401 ) history.push('/login')
         let formatted = resp.days.map(obj => {
           return {...obj, ...{date: moment(obj.date)}}
         })
@@ -108,6 +110,7 @@ function Home() {
   function clear() {
     API.delete('days', [])
       .then((resp) => {
+        if ( resp.status === 401 ) history.push('/login')
         setDays([])
       })
   }

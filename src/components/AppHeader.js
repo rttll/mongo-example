@@ -1,5 +1,5 @@
-import { useContext, useEffect } from 'react'
-import { useHistory, useLocation } from "react-router-dom";
+import { useContext} from 'react'
+import { useHistory, useLocation, Link } from "react-router-dom";
 import AppContext from '../services/app-context'
 
 
@@ -24,6 +24,12 @@ function AppHeader() {
           <h1 className="py-4 text-xs font-medium leading-none text-center text-white">
             <span>{ context.text }</span>
           </h1>
+          <Link
+            to="/login"
+            className="absolute top-0 right-0 z-10 block px-4 py-4 pl-8 text-xs leading-none text-white"
+          >
+            Login
+          </Link>
         </div>
       </div>
     </header>

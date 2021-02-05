@@ -23,6 +23,7 @@ function Meal() {
     context.set('Loading...')
     API.get('meals?id=' + params.id)
       .then((resp) => {
+        if ( resp.status === 401 ) history.push('/login')
         if (resp.meal) {
           setMeal(resp.meal)
           context.set(resp.meal.name)
@@ -50,6 +51,7 @@ function Meal() {
       id: params.id,
       meal: meal
     }).then((resp) => {
+      if ( resp.status === 401 ) history.push('/login')
       if (resp.meal) {
         console.log(resp.meal)
       } else {
@@ -78,6 +80,7 @@ function Meal() {
 
     API.delete('meals', {id: params.id})
       .then((resp) => {
+        if ( resp.status === 401 ) history.push('/login')
         if (resp.deleted === 1) {
           history.replace('/meals/')
         } else {

@@ -1,8 +1,15 @@
-
+import { useContext, useEffect } from 'react'
 import API from '../services/api'
+import AppContext from '../services/app-context'
+
 
 function Login() {
-
+  const context = useContext(AppContext)
+  
+  useEffect(() => {
+    context.set('Login')
+  }, [])
+  
   function login() {
     API.post('login')
       .then((resp) => {
