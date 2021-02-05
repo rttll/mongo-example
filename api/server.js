@@ -1,5 +1,4 @@
-const meals = require('./meals/[method]')
-const days = require('./days/[method]')
+const jetpack = require('fs-jetpack')
 const express = require('express')
 const app = express();
 
@@ -19,27 +18,41 @@ app.use(function(req, res, next) {
   next();
 });
 
-const actions = {
-  meals: meals,
-  days: days
+const getAction = (req) => {
+  const tree = jetpack.inspectTree(`${jetpack.cwd()}/api`).children
+  try {
+    const actionName = req.url
+      .replace(/\/api\//, '')
+      .match(/^\w+/)[0]
+    
+    let results = tree.filter(obj => obj.name.replace('.js', '') === actionName )
+    if ( results.length === 0 ) return null
+    
+    let path = './' + results[0].name
+    if ( results[0].type === 'dir') {
+      path += '/' + results[0].children[0].name
+    }
+    return require(path)
+  } catch (error) {
+    log(error)
+    return null
+  }
 }
+
 
 app.all('*', async (req, res) => {
   let url = req.url.replace(/\/api/, '')
-  // log('index.js', url)
-  
   if (url === '/') {
     res.status(200).send(`OK [${process.env.NODE_ENV}]`)
   }
   
-  const action = actions[url.split('/')[1]]
-  // log('index.js action', action)
+  // Get the serverless endpoint for this url
+  const action = getAction(req)
   if (action) {
     req.query.method = url.split('/').pop().split('?')[0]
-    // log('method', req.query.method)
     await action(req, res)
   } else {
-    res.status(404)
+    res.status(404).json({})
   }
 
 })

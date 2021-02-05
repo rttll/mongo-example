@@ -1,20 +1,19 @@
-const base = window.location.hostname === 'localhost' ? 'http://localhost:9000/api' : '/api'
 const log = console.log
-const dispatch = (method, url, data = {}) => {
-  
-  let config = { method: method }
-  
-  if (method !== 'GET') {
-    config.body = JSON.stringify(data)
-    config.headers = {
-      'Content-Type': 'application/json'
+
+const dispatch = (method, url, data = {}) => {  
+  let config = { 
+    method: method,
+    headers: {
+      'Content-Type': 'application/json',
+      'X-CSRF': 'z1pk66gvaeA83u5tSI8xqT7EPb1IuP1IOBqEQy0rZKIz6dNdI3mocJLevteM'
     }
   }
-  
+  if (method !== 'GET') { config.body = JSON.stringify(data) }
+
   // Append {method} to the url and move any get params to the end
-  let urlWithMethod = `${base}/${url.split('?')[0]}/${method.toLowerCase()}`
+  let urlWithMethod = `/api/${url.split('?')[0]}/${method.toLowerCase()}`
   urlWithMethod += `?${url.split('?').pop()}`
-  // console.log(urlWithMethod)
+  
   try {
     return fetch(urlWithMethod, config)
       .then((resp) => resp.json())

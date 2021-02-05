@@ -30,12 +30,13 @@ function App() {
       <Router>
         <div className="flex flex-col items-center w-screen bg-white">
           <AppHeader />
-          <div
-            className="relative w-full h-full"
-          >
+          <div className="relative w-full h-full">
             <Switch>
               <Route exact path="/">
                 <Home />
+              </Route>
+              <Route path="/login">
+                <Login />
               </Route>
               <Route path="/meals">
                 <Meals />

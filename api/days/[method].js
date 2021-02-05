@@ -1,5 +1,6 @@
-const { ObjectID } = require("mongodb");
-const { connectToDatabase, setCollection, getId} = require('../db_helper')
+const { connectToDatabase, setCollection, getId} = require('../lib/db')
+const { authorize } = require('../lib/auth')
+
 const log = console.log
 
 let db = null, daysCollection = null;
@@ -51,7 +52,11 @@ const methods = {
 }
 
 module.exports = async (req, res) => {
-  await setup()
-  const method = req.query.method || 'get'
-  methods[method](req, res)
+  if ( authorize(req) ) {
+    await setup()
+    const method = req.query.method || 'get'
+    methods[method](req, res)
+  } else {
+    res.status(401).json({})
+  }
 }

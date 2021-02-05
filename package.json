@@ -6,8 +6,11 @@
     "@craco/craco": "^6.0.0",
     "@tailwindcss/postcss7-compat": "^2.0.2",
     "autoprefixer": "^9",
+    "cookies": "^0.8.0",
+    "express-jwt": "^6.0.0",
     "framer": "^1.2.18",
     "framer-motion": "^3.2.2-rc.1",
+    "jsonwebtoken": "^8.5.1",
     "lodash": "^4.17.20",
     "moment": "^2.29.1",
     "mongodb": "^3.6.3",
@@ -16,6 +19,7 @@
     "react-dom": "^17.0.1",
     "react-router-dom": "^5.2.0",
     "react-scripts": "4.0.1",
+    "realm-web": "^1.2.0",
     "sortablejs": "^1.13.0",
     "tailwindcss": "npm:@tailwindcss/postcss7-compat",
     "web-vitals": "^0.2.4",
@@ -29,6 +33,7 @@
     "test": "craco test",
     "eject": "react-scripts eject"
   },
+  "proxy": "http://localhost:9000",
   "eslintConfig": {
     "extends": [
       "react-app",
@@ -51,6 +56,7 @@
     "copy-webpack-plugin": "^7.0.0",
     "dotenv": "^8.2.0",
     "express": "^4.17.1",
+    "fs-jetpack": "^4.1.0",
     "miragejs": "^0.1.41",
     "nodemon": "^2.0.7"
   }

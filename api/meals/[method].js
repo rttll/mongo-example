@@ -1,5 +1,5 @@
 const { ObjectID } = require("mongodb");
-const { connectToDatabase, setCollection, getId} = require('../db_helper')
+const { connectToDatabase, setCollection, getId} = require('../lib/db')
 const log = console.log
 
 let db = null, collection = null;
