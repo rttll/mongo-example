@@ -1,52 +1,39 @@
-import API from '../services/api'
+import { isValidElement, cloneElement } from 'react'
+import { useState } from 'react'
 
-const [addingMeal, setAddingMeal] = useState(false)
-  const [mealName, setMealName] = useState('')
-
-function createMeal(e) {
-  e.preventDefault();
-
-  if ( addingMeal ) return;
-  setAddingMeal(true)
+function Form(props) {
+  const [data, setData] = useState({})
   
-  API.post('meals', {name: mealName})
-    .then(meal => {
-      setMeals(meals.concat([meal]))
-      setMealName('')
-    })
-    .catch((err) => {
-      console.error(err)
-    })
-    .finally(() => {
-      setAddingMeal(false)
-    })
+  const inputs = props.children.map((child, i) => {
+    if ( isValidElement(child) ) {
+      return cloneElement(child, {onChange: inputChanged, key: i})
+    }
+  })
+
+  function inputChanged(event) {
+    const { name, value } = event.target
+    setData((currentData) => ({
+      ...currentData, [name]: value
+    }))
+  }
+
+  function send(e) {
+    e.preventDefault()
+    API.post(props.action, data)
+      .then((resp) => {
+        debugger
+      })
+      .catch(console.error)
+  }
+
+  return (
+    <form onSubmit={send} className="p-4">
+      { inputs }
+      <div className="flex justify-end p-4">
+        <button className="p-4 py-2 text-xs text-white bg-purple-700 rounded-full">Save</button>
+      </div>
+    </form>
+  )
 }
 
-{/* <form action="/meals" onSubmit={createMeal}>
-          <div className="flex justify-between border-b border-gray-300">
-            <input 
-              type="text" 
-              className="block w-full p-4"
-              value={mealName}
-              onChange={ (e) => setMealName(e.target.value) }
-              placeholder="Create new meal"
-            />
-            <button type="submit" className="p-4">+</button>
-          </div>
-        </form>
-
-
-<Frame height={200} backgroundColor="transparent">
-        <form action="/meals" onSubmit={createMeal}>
-          <div className="flex justify-between border-b border-gray-300">
-            <input 
-              type="text" 
-              className="block w-full p-4"
-              value={mealName}
-              onChange={ (e) => setMealName(e.target.value) }
-              placeholder="Create new meal"
-            />
-            <button type="submit" className="p-4">+</button>
-          </div>
-        </form>        
-      </Frame> */}
+export default Form

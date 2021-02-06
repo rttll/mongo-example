@@ -1,7 +1,8 @@
-import { useContext, useEffect } from 'react'
+import { useContext, useEffect, useState } from 'react'
 import API from '../services/api'
 import AppContext from '../services/app-context'
-
+import { Input } from './FormElements'
+import Form from './Form'
 
 function Login() {
   const appHeader = useContext(AppContext)
@@ -24,10 +25,20 @@ function Login() {
       .catch(console.error)
   }
 
+  function emailLogin() {
+    console.log()
+  }
+
+  
+
   return (
     <>
       <h1>Login</h1>
-      <button className="p-4 bg-purple-100" onClick={login}>Log In</button>
+      <Form action="/login">
+        <Input value="" name="email" />
+        <Input value="" name="password" />
+      </Form>
+      {/* <button className="p-4 bg-purple-100" onClick={login}>Log In</button> */}
     </>
   )
 }
