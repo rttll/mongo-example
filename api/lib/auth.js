@@ -5,7 +5,7 @@ if ( process.env.NODE_ENV !== 'production') {
   require('dotenv').config()
 }
 
-const tokenKey = process.env.TOKEN_KEY
+const jwtKey = process.env.JWT_KEY
 
 function signToken(user) {
   return jwt.sign({ 
@@ -14,11 +14,11 @@ function signToken(user) {
       access: user._accessToken,
       refresh: user._refreshToken
     }
-  }, tokenKey)
+  }, jwtKey)
 }
 
 function isSameSite(headers) {
-  return headers['x-csrf'] === process.env.CSRF_KEY
+  return headers['x-csrf'] === process.env.CSRF
 }
 
 // let header = req.headers.authorization
@@ -28,7 +28,7 @@ function isSameSite(headers) {
 function _verifyToken(req, res) {
   let cookies = new Cookies(req, res)
   try {
-    return jwt.verify(cookies.get('token'), tokenKey)
+    return jwt.verify(cookies.get('token'), jwtKey)
   } catch (error) {
     return false;
   }
