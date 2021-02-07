@@ -1,14 +1,18 @@
 import { isValidElement, cloneElement } from 'react'
 import { useState } from 'react'
+import API from '../services/api'
 
 function Form(props) {
   const [data, setData] = useState({})
-  
-  const inputs = props.children.map((child, i) => {
-    if ( isValidElement(child) ) {
-      return cloneElement(child, {onChange: inputChanged, key: i})
-    }
-  })
+
+  let inputs;
+  if ( props.children ) {
+    inputs = props.children.map((child, i) => {
+      if ( isValidElement(child) ) {
+        return cloneElement(child, {onChange: inputChanged, key: i})
+      }      
+    })
+  }
 
   function inputChanged(event) {
     const { name, value } = event.target
@@ -21,16 +25,18 @@ function Form(props) {
     e.preventDefault()
     API.post(props.action, data)
       .then((resp) => {
-        debugger
+        props.afterSubmit(resp)
       })
       .catch(console.error)
   }
 
   return (
-    <form onSubmit={send} className="p-4">
-      { inputs }
-      <div className="flex justify-end p-4">
-        <button className="p-4 py-2 text-xs text-white bg-purple-700 rounded-full">Save</button>
+    <form onSubmit={send} className="p-4 space-y-2">
+      { props.children && inputs }
+      <div className="flex justify-end">
+        <button className="p-4 py-2 text-xs text-white bg-purple-700 rounded-full">
+          {props.buttonText || 'Save'}
+        </button>
       </div>
     </form>
   )

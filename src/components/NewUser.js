@@ -1,4 +1,5 @@
-import { useContext, useEffect } from 'react'
+import { useContext, useEffect, useState } from 'react'
+import API from '../services/api'
 import AppContext from '../services/app-context'
 import { Input } from './FormElements'
 import Form from './Form'
@@ -9,15 +10,19 @@ function Login() {
   const history = useHistory()
   
   useEffect(() => {
-    appHeader.setTitle('Login')
+    appHeader.setTitle('New Account')
   }, [])
   
   function afterSubmit(resp) {
     if (resp.status === 200) {
       if (resp.id) {
+        alert('success!')
+        // anonymous login
         delete resp.status
         appHeader.setUser(resp)
-        history.push('/')
+      } else {
+        alert('success! now please log into new account')
+        history.push('/login')
       }
     } else {
       alert(resp.error)
@@ -26,15 +31,18 @@ function Login() {
 
   return (
     <>
-      <h1 className="px-4 py-2 font-medium">Login</h1>
+      <h1 className="px-4 py-2 font-medium"> Create your account </h1>
       <Form 
-        action="/sessions/login"
-        buttonText="Login"
+        action='/users'
+        buttonText='Create'
         afterSubmit={afterSubmit}
       >
         <Input value="" name="email" />
         <Input value="" name="password" />
       </Form>
+      <p className="text-xs">Or you can
+        <a href="">login anonymously</a> to take a look around
+      </p>
     </>
   )
 }

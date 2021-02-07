@@ -31,9 +31,6 @@ function AppHeader() {
               Login
             </Link>
           }
-          {appHeader.user && 
-            <span className="absolute top-0 right-0 z-10 block px-4 py-4 pl-8 text-xs leading-none text-white">o</span>
-          }
         </div>
       </div>
     </header>

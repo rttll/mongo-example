@@ -11,6 +11,8 @@ import Home from './Home'
 import Meals from './Meals'
 import Day from './Day'
 import Login from './Login'
+import NewUser from './NewUser'
+import Account from './Account'
 import AppContext from '../services/app-context'
 import './App.css';
 
@@ -47,17 +49,20 @@ function App() {
               <Route exact path="/">
                 <Home />
               </Route>
-              <Route path="/login">
-                <Login />
-              </Route>
               <Route path="/meals">
                 <Meals />
               </Route>
               <Route path="/days/:action/:slug">
                 <Day />
               </Route>
+              <Route path="/users">
+                <NewUser />
+              </Route>
               <Route path="/login">
                 <Login />
+              </Route>
+              <Route path="/account">
+                <Account />
               </Route>
             </Switch>
           </div>
