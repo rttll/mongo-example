@@ -7,7 +7,7 @@ import {
 } from "react-router-dom";
 
 import AppHeader from './AppHeader'
-import Home from './Home'
+import Calendar from './Calendar'
 import Meals from './Meals'
 import Day from './Day'
 import Login from './Login'
@@ -47,7 +47,7 @@ function App() {
           <div className="relative w-full h-full">
             <Switch>
               <Route exact path="/">
-                <Home />
+                <Calendar />
               </Route>
               <Route path="/meals">
                 <Meals />

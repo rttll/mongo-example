@@ -5,6 +5,7 @@ import { times } from 'lodash'
 import API from '../services/api'
 import AppContext from '../services/app-context'
 import { list } from '../util/motion'
+import CalendarDay from './CalendarDay'
 
 import {
   Link,
@@ -12,7 +13,7 @@ import {
   useRouteMatch
 } from "react-router-dom";
 
-function Home() {
+function Calendar() {
   const history = useHistory()
   const [days, setDays] = useState([])
   const [grid, setGrid] = useState([])
@@ -21,15 +22,20 @@ function Home() {
   
   useEffect(() => {
     appHeader.setTitle() // Sets header text to default 
-    API.get('days')
-      .then((resp) => { 
-        if ( resp.status === 401 ) history.push('/login')
-        let formatted = resp.days.map(obj => {
-          return {...obj, ...{date: moment(obj.date)}}
-        })
-        mergeDaysAndGrid(formatted)
-      })
-      .catch(console.log)
+    makeGrid().then((grid) => {
+      setGrid(grid)
+    })
+    // API.get('days')
+    //   .then((resp) => { 
+    //     // if ( resp.status === 401 ) history.push('/login')
+    //     console.log(resp)
+    //     setDays(
+    //       resp.days.map(obj => { return {...obj, ...{date: moment(obj.date)}} })
+    //     )
+    //   })
+    //   .catch((err) => {
+    //     console.error(err)
+    //   })
   }, [])
   
   useEffect(() => {
@@ -41,25 +47,6 @@ function Home() {
     }
   }, [grid])
 
-  function mergeDaysAndGrid(days) {
-    makeGrid().then((grid) => {
-      let merged = grid.map((month) => {
-        let formatted = month.dates.map((gridObj) => {
-          let filteredDays = days.filter(obj => obj.date.valueOf() === gridObj.timestamp)
-          let href = `/days/new/${gridObj.timestamp}`
-          let mealIds = []
-          if ( filteredDays.length > 0 ) {
-            let day = filteredDays[0]
-            mealIds = day.mealIds
-            href = `/days/show/${day._id}`
-          }
-          return {...gridObj, ...{href: href, mealIds: mealIds} }
-        })
-        return {...month, ...{dates: formatted} }
-      })
-      setGrid(merged)
-    })
-  }
 
   function makeGrid() {
     return new Promise(function(resolve, reject) {
@@ -106,14 +93,6 @@ function Home() {
       resolve(gridDates)
     })
   }
-
-  function clear() {
-    API.delete('days', [])
-      .then((resp) => {
-        if ( resp.status === 401 ) history.push('/login')
-        setDays([])
-      })
-  }
   
   return (
     <>
@@ -129,30 +108,17 @@ function Home() {
           </header>
           <div className="grid flex-1 grid-cols-7 bg-gray-100">
             {month.dates.map((obj) =>
-              <Link 
-                to={obj.href}
-                key={obj.id} 
-                id={ obj.isToday ? 'today' : ''}
-                className={`${obj.isToday ? 'bg-yellow-100' : ''} ${obj.filler ? 'opacity-0' : 'bg-white'} flex-col items-center relative flex justify-center border-b border-r border-gray-200 hover:bg-blue-50`}
-              >
-                <p className="font-medium text-gray-700">
-                  {obj.date}
-                </p>
-                <div className="flex p-1 space-x-1 overflow-hidden whitespace-nowrap">
-                  {obj.mealIds.map(int => 
-                    <i key={int} className="w-1 h-1 bg-yellow-500 rounded-full"></i>
-                  )}
-                </div>
-              </Link>
+              <CalendarDay 
+                key={obj.id}  
+                date={obj} 
+                days={days}
+              />
             )}
           </div>
         </div>
       )}
-      <div className="p-1">
-        { days.length > 0 && <a href="#" onClick={ clear } className="inline-block p-4 my-8 text-lg text-red-600">X</a> }
-      </div>
     </>
   )
 }
 
-export default Home
+export default Calendar
