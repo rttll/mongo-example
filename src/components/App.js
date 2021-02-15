@@ -14,9 +14,15 @@ import Login from './Login'
 import NewUser from './NewUser'
 import Account from './Account'
 import AppContext from '../services/app-context'
+import { RealmAppProvider } from "./RealmApp";
 import './App.css';
 
+if ( process.env.NODE_ENV !== 'production') {
+  require('dotenv').config()
+}
+
 function App() {
+
   const defaultText = 'Meal Planner'
   const [headerText, setHeaderText] = useState(defaultText)
   const [user, setUser] = useState(null)
@@ -40,35 +46,37 @@ function App() {
   }, [])
 
   return (
-    <AppContext.Provider value={defaultHeader}>
-      <Router>
-        <div className="flex flex-col items-center w-screen bg-white">
-          <AppHeader />
-          <div className="relative w-full h-full">
-            <Switch>
-              <Route exact path="/">
-                <Calendar />
-              </Route>
-              <Route path="/meals">
-                <Meals />
-              </Route>
-              <Route path="/days/:action/:slug">
-                <Day />
-              </Route>
-              <Route path="/users">
-                <NewUser />
-              </Route>
-              <Route path="/login">
-                <Login />
-              </Route>
-              <Route path="/account">
-                <Account />
-              </Route>
-            </Switch>
+    <RealmAppProvider appId={ 'mealplanner-pqmhu' }>
+      <AppContext.Provider value={defaultHeader}>
+        <Router>
+          <div className="flex flex-col items-center w-screen bg-white">
+            <AppHeader />
+            <div className="relative w-full h-full">
+              <Switch>
+                <Route exact path="/">
+                  <Calendar />
+                </Route>
+                <Route path="/meals">
+                  <Meals />
+                </Route>
+                <Route path="/days/:id">
+                  <Day />
+                </Route>
+                <Route path="/users">
+                  <NewUser />
+                </Route>
+                <Route path="/login">
+                  <Login />
+                </Route>
+                <Route path="/account">
+                  <Account />
+                </Route>
+              </Switch>
+            </div>
           </div>
-        </div>
-      </Router>
-    </AppContext.Provider>
+        </Router>
+      </AppContext.Provider>
+    </RealmAppProvider>
   )
 }
 

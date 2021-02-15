@@ -6,6 +6,7 @@ import API from '../services/api'
 import AppContext from '../services/app-context'
 import { list } from '../util/motion'
 import CalendarDay from './CalendarDay'
+import { useRealmApp } from "./RealmApp";
 
 import {
   Link,
@@ -14,6 +15,7 @@ import {
 } from "react-router-dom";
 
 function Calendar() {
+  const app = useRealmApp()
   const history = useHistory()
   const [days, setDays] = useState([])
   const [grid, setGrid] = useState([])
@@ -25,17 +27,19 @@ function Calendar() {
     makeGrid().then((grid) => {
       setGrid(grid)
     })
-    // API.get('days')
-    //   .then((resp) => { 
-    //     // if ( resp.status === 401 ) history.push('/login')
-    //     console.log(resp)
-    //     setDays(
-    //       resp.days.map(obj => { return {...obj, ...{date: moment(obj.date)}} })
-    //     )
-    //   })
-    //   .catch((err) => {
-    //     console.error(err)
-    //   })
+    
+    app.getDays().then((days) => {
+      setGrid((oldGrid) => {
+        return oldGrid.map(month => {
+          let dates = month.dates.map(date => {
+            let filteredDays = days.filter(day => day.date === date.timestamp)
+            if (filteredDays.length === 0) return date
+            return {...date, ...filteredDays[0]}
+          })
+          return {...month, ...{dates: dates}}
+        })
+      })
+    })
   }, [])
   
   useEffect(() => {
@@ -70,20 +74,22 @@ function Calendar() {
           if (offset > 0) {
             times(offset, (i) => {
               curMonth.dates.push({
-                id: Math.random(),
+                dayOfYear: Math.random(), // For the list key
                 filler: true
               })
             })
           }
         }
+        // let formatted = gridDate.format("dddd, MMMM Do YYYY, h:mm:ss a")
+        // formatted: formatted,
         curMonth.dates.push({
-          id: gridDate.dayOfYear(), 
-          date: gridDate.date(),
-          // date: gridDate.format('ddd, MMM') + ' ' + gridDate.date(),
           timestamp: gridDate.valueOf(),
-          isToday: gridDate.dayOfYear() === moment().dayOfYear()
+          dayOfYear: gridDate.dayOfYear(), 
+          dayOfMonth: gridDate.date(),
+          isToday: gridDate.dayOfYear() === moment().dayOfYear(),
         })
         
+
         gridDate.add(1, 'day')
         
         if ( gridDate.date() === gridDate.daysInMonth() ) {
@@ -107,11 +113,10 @@ function Calendar() {
             </div>
           </header>
           <div className="grid flex-1 grid-cols-7 bg-gray-100">
-            {month.dates.map((obj) =>
+            {month.dates.map(obj =>
               <CalendarDay 
-                key={obj.id}  
-                date={obj} 
-                days={days}
+                key={obj.dayOfYear}  
+                data={obj} 
               />
             )}
           </div>

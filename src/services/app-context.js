@@ -13,5 +13,8 @@ export default React.createContext({
   text: defaultText,
   user: {},
   setTitle: () => {},
-  setUser: () => {}
+  setUser: () => {},
+  login: () => {
+    console.log('hiiii')
+  }
 })

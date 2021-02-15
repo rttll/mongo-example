@@ -4,12 +4,14 @@ import { Switch, Route, useParams, useRouteMatch, useHistory } from "react-route
 import { Scroll } from 'framer'
 import API from '../services/api'
 import AppContext from '../services/app-context'
+import { useRealmApp } from './RealmApp'
 
 import List from './List'
 import Sheet from './Sheet'
 
 function Day() {
-  let { action, slug } = useParams();
+  window.moment = moment
+  let { id } = useParams();
   const { path, url } = useRouteMatch(); 
   const history = useHistory()
   const appHeader = useContext(AppContext)
@@ -19,13 +21,22 @@ function Day() {
   const [isSheetActive, setIsSheetActive] = useState(false)
   const [meals, setMeals] = useState([])
   
+  const app = useRealmApp()
+
   useEffect(() => {    
     appHeader.setTitle('Loading...')
-    if ( action === 'show' ) {
-      get()
-    } else {
-      create()
-    }
+    // app.currentUser.functions.getAllDays(id).then((resp) => {
+    //   setDay(resp)
+    // })
+    app.getOneDay(id).then((resp) => {
+      let day = {...resp.day, ...{date: moment(resp.day.date)}}
+      if (day.meals.length > 0 && day.mealOrder.length > 0) {
+        day.meals = orderMeals(day.meals, day.mealOrder)
+      }
+      setDay(day)
+      appHeader.setTitle( day.date.format('ddd, MMM') + ' ' + day.date.date() )
+    }) 
+    
   }, [])
 
   useEffect(() => {
@@ -41,40 +52,14 @@ function Day() {
       .catch((err) => console.log)
   }, [isSheetActive])  
 
-  function formatAndSetDay(day) {
-    let base = {...day, ...{date: moment(day.date)}}
+  function orderMeals(meals, order) {
     const sorter = (a, b) => {
-      let mealIndex = base.mealOrder.indexOf(a._id)
-      let orderIndex = base.mealOrder.indexOf(b._id)
+      let mealIndex = order.indexOf(a._id)
+      let orderIndex = order.indexOf(b._id)
       let x = mealIndex < orderIndex ? -1 : 0
       return x
     }
-    if (base.meals.length > 0 && base.mealOrder.length > 0) {
-      base.meals = base.meals.sort(sorter)
-    }
-    setDay(base)
-  }
-
-  function create() {
-    let date = moment(parseInt(slug))
-    API.post('days', {date: date.valueOf()})
-      .then(resp => {
-        if ( resp.status === 401 ) history.push('/login')
-        setDay({...resp.day, ...{date: date}})
-        appHeader.setTitle(date.format('dddd'))
-        history.replace(`/days/show/${resp.day._id}`)
-      })
-    .catch(console.log)
-  }
-
-  function get() {
-    API.get('days?id=' + slug)
-    .then((resp) => {
-      if ( resp.status === 401 ) history.push('/login')
-      formatAndSetDay(resp.day)
-      appHeader.setTitle(moment(resp.day.date).format('dddd, MMM D'))
-    })
-    .catch(console.error)
+    return meals.sort(sorter)
   }
 
   let sortTimer = null;
@@ -87,7 +72,7 @@ function Day() {
   }
 
   function saveSort(order) {
-    API.patch('days', { id: slug, day: {mealOrder: order}} )
+    API.patch('days', { id: id, day: {mealOrder: order}} )
       .then((resp) => {
         if ( resp.status === 401 ) history.push('/login')
       })
@@ -98,7 +83,7 @@ function Day() {
     event.preventDefault()
     let mealId = meal._id
     const mealIds = day.mealIds.indexOf(mealId) === -1 ? day.mealIds.concat([mealId]) : day.mealIds.filter(id => id !== mealId)
-    return API.patch('days', { id: slug, day: {mealIds: mealIds } } )
+    return API.patch('days', { id: id, day: {mealIds: mealIds } } )
       .then((resp) => {
         if (resp.day) {
           setDay({...resp.day, ...{date: moment(resp.day.date)}})
