@@ -1,83 +1,63 @@
-import { useState, useEffect } from 'react'
-import {
-  BrowserRouter as Router,
-  Switch,
-  Route,
-  Link
-} from "react-router-dom";
-
-import AppHeader from './AppHeader'
-import Calendar from './Calendar'
-import Meals from './Meals'
-import Day from './Day'
-import Login from './Login'
-import NewUser from './NewUser'
-import Account from './Account'
-import AppContext from '../services/app-context'
-import { RealmAppProvider } from "./RealmApp";
+import { useEffect, useState } from 'react';
 import './App.css';
 
-if ( process.env.NODE_ENV !== 'production') {
-  require('dotenv').config()
-}
-
-function App() {
-
-  const defaultText = 'Meal Planner'
-  const [headerText, setHeaderText] = useState(defaultText)
-  const [user, setUser] = useState(null)
-  
-  const defaultHeader = {
-    text: headerText,
-    setTitle: (text = defaultText) => {
-      setHeaderText(text)
-    },
-    user: user,
-    setUser: (user) => {
-      localStorage.setItem('meal-planner-user', JSON.stringify(user))
-      setUser(user)
-    }
-  }
+const server = 'http://localhost:9000';
+export default function App() {
+  const [loading, setLoading] = useState(true);
+  const [bots, setBots] = useState([]);
 
   useEffect(() => {
-    let user = localStorage.getItem('meal-planner-user')
-    if (user === null) return;
-    setUser(JSON.parse(user))
-  }, [])
+    fetch(server + '/bots')
+      .then((resp) => resp.json())
+      .then((json) => {
+        if (json.bots) setBots(json.bots);
+        setLoading(false);
+      })
+      .catch(console.error);
+  }, []);
+
+  function create(e) {
+    e.preventDefault();
+    fetch(server + '/bots', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        name: `George #${bots.length + 1}`,
+        almostHuman: true,
+      }),
+    })
+      .then((resp) => resp.json())
+      .then((json) => {
+        if (json.bot) setBots(bots.concat([json.bot]));
+      })
+      .catch(console.error);
+  }
+
+  if (loading) {
+    return <div>Loading...</div>;
+  }
 
   return (
-    <RealmAppProvider appId={ 'mealplanner-pqmhu' }>
-      <AppContext.Provider value={defaultHeader}>
-        <Router>
-          <div className="flex flex-col items-center w-screen bg-white">
-            <AppHeader />
-            <div className="relative w-full h-full">
-              <Switch>
-                <Route exact path="/">
-                  <Calendar />
-                </Route>
-                <Route path="/meals">
-                  <Meals />
-                </Route>
-                <Route path="/days/:id">
-                  <Day />
-                </Route>
-                <Route path="/users">
-                  <NewUser />
-                </Route>
-                <Route path="/login">
-                  <Login />
-                </Route>
-                <Route path="/account">
-                  <Account />
-                </Route>
-              </Switch>
-            </div>
-          </div>
-        </Router>
-      </AppContext.Provider>
-    </RealmAppProvider>
-  )
+    <>
+      <a
+        href='/'
+        onClick={create}
+        style={{
+          color: '#222',
+          background: 'lemonchiffon',
+          borderRadius: '6px',
+          padding: '1rem 2.6rem',
+        }}>
+        Create bot
+      </a>
+      <div style={{ margin: '3rem 0' }}>
+        {bots.length === 0 && <div>no bots yet</div>}
+        {bots.map((bot) => (
+          <div key={bot._id}>{bot.name}</div>
+        ))}
+      </div>
+    </>
+  );
 }
-
-export default App;
